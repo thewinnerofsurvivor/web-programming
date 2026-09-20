@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My CSS Portfolio</title>
+  <style>
+    /* 1. Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* 2. Base styles (body, a, h1-h3, p) */
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      line-height: 1.6;
+      color: #222;
+      background-color: #fff;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    h1, h2, h3 {
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    p {
+      color: #6b7280;
+    }
+
+    /* 3. Navigation */
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      background-color: #1f2937;
+    }
+
+    .nav-logo {
+      color: #fff;
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .nav-links a {
+      color: #e5e7eb;
+      font-size: 0.95rem;
+      transition: color 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: #000;
+    }
+
+    /* 4. Hero section */
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 100px 20px;
+      background-color: #111827;
+    }
+
+    .avatar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background-color: lightgreen;
+      color: #111827;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      color: #fff;
+      font-size: 3rem;
+      margin-bottom: 16px;
+    }
+
+    .hero p {
+      color: #9ca3af;
+      font-size: 1.1rem;
+    }
+
+    .hero p + p {
+      margin-bottom: 32px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 28px;
+      background-color: lightgreen;
+      color: #111827;
+      font-weight: 700;
+      border-radius: 6px;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .btn:hover {
+      background-color: lightgreen;
+      transform: translateY(-2px);
+    }
+
+    /* 5. Skills grid */
+    .skills-section {
+      padding: 80px 40px;
+      text-align: center;
+    }
+
+    .skills-section h2 {
+      font-size: 2rem;
+      margin-bottom: 48px;
+      color: #111827;
+    }
+
+    .skills-grid {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+
+    .skill-card {
+      flex: 1 1 calc(50% - 24px);
+      max-width: 320px;
+      background-color: #fff;
+      padding: 32px 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+      transition: transform 0.2s ease;
+    }
+
+    .skill-card:hover {
+      transform: translateY(-6px);
+    }
+
+    .skill-card h3 {
+      color: #000;
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+    }
+
+    @media (min-width: 900px) {
+      .skill-card {
+        flex: 1 1 calc(25% - 24px);
+      }
+    }
+
+    /* 5b. Education timeline */
+    .timeline-section {
+      padding: 80px 40px;
+      text-align: center;
+      background-color: #f3f4f6;
+    }
+
+    .timeline-section h2 {
+      font-size: 2rem;
+      margin-bottom: 48px;
+      color: #111827;
+    }
+
+    .timeline {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+
+    .timeline-item {
+      flex: 1 1 calc(50% - 24px);
+      max-width: 320px;
+      background-color: #fff;
+      padding: 28px 20px;
+      border-radius: 10px;
+      border-top: 4px solid lightgreen;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+      text-align: left;
+      transition: transform 0.2s ease;
+    }
+
+    .timeline-item:hover {
+      transform: translateY(-6px);
+    }
+
+    .timeline-year {
+      display: inline-block;
+      color: #000;
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+    }
+
+    .timeline-item h3 {
+      font-size: 1.1rem;
+      margin-bottom: 6px;
+      color: #111827;
+    }
+
+    @media (min-width: 900px) {
+      .timeline-item {
+        flex: 1 1 calc(25% - 24px);
+      }
+    }
+
+    /* 6. Footer */
+    .footer {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+      background-color: #1f2937;
+      color: #9ca3af;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <span class="nav-logo">Yong Wee's Portfolio</span>
+    <div class="nav-links">
+      <a href="#skills">Skills</a>
+      <a href="#education">Education</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="avatar">YW</div>
+    <h1>Ooi Yong Wee</h1>
+    <p>Student in Information Technology</p>
+    <p>Nanyang Polytechnic</p>
+    <a href="#skills" class="btn">See My Skills</a>
+  </section>
+
+  <section class="skills-section" id="skills">
+    <h2>My Skills</h2>
+    <div class="skills-grid">
+      <div class="skill-card"><h3>Responsive Web Programming</h3><p>Building applications that can adapt across screen sizes</p></div>
+      <div class="skill-card"><h3>Database Design & Administration</h3><p>Model, query and manage relational data using Oracle</p></div>
+      <div class="skill-card"><h3>Applied AI & Analytics</h3><p>Analysing data and making predictions and insights</p></div>
+      <div class="skill-card"><h3>Agile Development with DevOps</h3><p>Iterative development and delivery with CI / CD pipelines</p></div>
+    </div>
+  </section>
+
+  <section class="timeline-section" id="education">
+    <h2>My Education Journey</h2>
+    <div class="timeline">
+      <div class="timeline-item">
+        <span class="timeline-year">2024</span>
+        <h3>Completed O Levels</h3>
+        <p>Finished secondary education</p>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-year">2025</span>
+        <h3>Started Polytechnic</h3>
+        <p>Began studies in Information Technology</p>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-year">Early 2026</span>
+        <h3>Completed Year 2</h3>
+        <p>Finished second year of polytechnic studies</p>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-year">Late 2026</span>
+        <h3>Exchange Program</h3>
+        <p>Studying at Gachon University</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>K0126002 Web Programming &copy; 2026 Gachon University</p>
+  </footer>
+</body>
+</html>

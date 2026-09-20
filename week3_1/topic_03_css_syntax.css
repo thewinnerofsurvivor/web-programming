@@ -1,0 +1,22 @@
+/* Basic CSS rule anatomy */
+selector {
+    property: value;
+    property: value;
+}
+
+/* Real Examples */
+h1 {
+    color: #15803d; /* Text colour */
+    font-size: 2rem; /* Size */
+    font-weight: bold; /* Weight */
+    text-align: center; /* Alignment */
+}
+
+p {
+    line-height: 1.7; /* Space between Lines */
+    max-width: 65ch; /* Column Width */
+}
+
+/* Common Mistakes */
+/* h1 { color = red }
+/* h1 { color: red }

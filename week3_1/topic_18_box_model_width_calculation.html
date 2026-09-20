@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+        /* Default is content-box - width = content only */
+
+        .content-box {
+            box-sizing: content-box;
+            width: 200px;
+            padding: 10px;
+            border: 5px solid #10B981;
+            background: #ECFDF5;
+            margin-bottom: 16px;
+        }
+
+        /* Total = 200 + 10 * 2 + 5 * 2 = 230px
+
+        /* Better: border-box - width includes padding + border */
+        .border-box {
+            box-sizing: border-box;
+            width: 200px;
+            padding: 10px;
+            border: 5px solid #7c5aed;
+            background: #f5f3ff;
+        }
+
+        /* Total = Exactly 200px, but content shrinks to 170px */
+    </style>
+</head>
+<body>
+    <div class="content-box">content-box</div>
+    <p>→ Actual width = 200 + 10×2 + 5×2 = <strong>230px</strong></p>
+
+    <div class="border-box">border-box</div>
+    <p>→ Actual width = exactly <strong>200px</strong></p>
+</body>
+</html>

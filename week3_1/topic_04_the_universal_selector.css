@@ -1,0 +1,20 @@
+/* The Classic CSS Reset using */
+
+*, *::before, *::after {
+    box-sizing: border-box; /* -> This means padding and border will be calculated into the width. */
+    margin: 0;
+    padding: 0;
+}
+
+/* Now you add styles on top cleanly */
+body {
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    background: #f8fafc;
+    color: #1e293b;
+}
+
+/* Avoid doing this as it affects every element */
+* {
+    color: blue
+}
