@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Registration</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: sans-serif;
+        background-color: #f4f6f8;
+        color: #222;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 60px 16px;
+    }
+
+    .card {
+        background-color: white;
+        border-radius: 12px;
+        padding: 32px;
+        width: 100%;
+        max-width: 480px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+        color: #0b63c4;
+        font-size: 1.6rem;
+        margin-bottom: 4px;
+    }
+
+    .subtitle {
+        color: #6b7280;
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+    }
+
+    fieldset {
+        border: 1px solid #dde1e6;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+
+    legend {
+        font-weight: bold;
+        padding: 0 6px;
+    }
+
+    .field {
+        margin-bottom: 14px;
+    }
+
+    .field:last-child {
+        margin-bottom: 0;
+    }
+
+    label {
+        display: block;
+        font-weight: bold;
+        font-size: 0.9rem;
+        margin-bottom: 4px;
+    }
+
+    input {
+        width: 100%;
+        padding: 10px 12px;
+        font: inherit;
+        border: 2px solid #d1d5db;
+        border-radius: 8px;
+        background-color: white;
+    }
+
+    .hint {
+        display: block;
+        color: #6b7280;
+        font-size: 0.8rem;
+        margin-top: 4px;
+    }
+
+    /* Validity states — JS sets aria-invalid once the user has
+       interacted with a field, so untouched fields stay neutral */
+    input[aria-invalid="false"] {
+        border-color: #27C93F;
+        background-color: #f0fdf4;
+    }
+
+    input[aria-invalid="true"] {
+        border-color: #FF5F56;
+        background-color: #fef2f2;
+    }
+
+    /* Inline error message under each input (filled in by JS) */
+    .error {
+        display: block;
+        color: #b91c1c;
+        font-size: 0.8rem;
+        margin-top: 4px;
+    }
+
+    .error:empty {
+        display: none;
+    }
+
+    /* Focus ring for keyboard navigation */
+    input:focus {
+        outline: 3px solid #F7DF1E;
+        outline-offset: 2px;
+    }
+
+    button {
+        width: 100%;
+        background-color: #0b63c4;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 12px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #094f9c;
+    }
+
+    #success {
+        display: none;
+        background-color: #ecfdf5;
+        border-left: 5px solid #10B981;
+        color: #065f46;
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-top: 16px;
+    }
+
+    .back {
+        display: inline-block;
+        margin-top: 20px;
+        color: #0b63c4;
+        font-size: 0.9rem;
+        text-decoration: none;
+    }
+
+    .back:hover {
+        text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Student Registration</h1>
+    <p class="subtitle">Week 6 Assignment · JavaScript Form Validation</p>
+
+    <!-- novalidate: browser tooltips off, our own inline errors only.
+         The validity API (checkValidity, validity.*) still works. -->
+    <form id="reg-form" action="/register" method="POST" novalidate>
+      <fieldset>
+        <legend>Student Info</legend>
+
+        <div class="field">
+          <label for="sname">Full Name</label>
+          <input type="text" id="sname" name="sname" placeholder="Hong Gildong"
+                 required minlength="2" maxlength="50" autocomplete="name"
+                 aria-describedby="sname-error">
+          <span id="sname-error" class="error" aria-live="polite"></span>
+        </div>
+
+        <div class="field">
+          <label for="sid">Student ID</label>
+          <input type="text" id="sid" name="sid" placeholder="202312345"
+                 required inputmode="numeric" maxlength="9"
+                 aria-describedby="sid-hint sid-error">
+          <span id="sid-hint" class="hint">9 digits, e.g. 202312345</span>
+          <span id="sid-error" class="error" aria-live="polite"></span>
+        </div>
+
+        <div class="field">
+          <label for="semail">Gachon Email</label>
+          <input type="email" id="semail" name="semail" placeholder="you@gachon.ac.kr"
+                 required autocomplete="email"
+                 aria-describedby="semail-error">
+          <span id="semail-error" class="error" aria-live="polite"></span>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Account</legend>
+
+        <div class="field">
+          <label for="pw">Password</label>
+          <input type="password" id="pw" name="pw"
+                 required minlength="8" autocomplete="new-password"
+                 aria-describedby="pw-hint pw-error">
+          <span id="pw-hint" class="hint">At least 8 characters, with 1 uppercase letter and 1 number</span>
+          <span id="pw-error" class="error" aria-live="polite"></span>
+        </div>
+
+        <div class="field">
+          <label for="pw2">Confirm Password</label>
+          <input type="password" id="pw2" name="pw2"
+                 required autocomplete="new-password"
+                 aria-describedby="pw2-error">
+          <span id="pw2-error" class="error" aria-live="polite"></span>
+        </div>
+      </fieldset>
+
+      <button type="submit">Register</button>
+    </form>
+
+    <p id="success" role="status"></p>
+
+    <a class="back" href="../../index.html">← Back to all exercises</a>
+  </div>
+
+  <script>
+    const SID_REGEX = /^\d{9}$/;
+    const EMAIL_REGEX = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+    const UPPERCASE_REGEX = /[A-Z]/;
+    const DIGIT_REGEX = /\d/;
+
+    const form = document.getElementById('reg-form');
+    const sname = document.getElementById('sname');
+    const sid = document.getElementById('sid');
+    const semail = document.getElementById('semail');
+    const pw = document.getElementById('pw');
+    const pw2 = document.getElementById('pw2');
+    const success = document.getElementById('success');
+
+    const fields = [sname, sid, semail, pw, pw2];
+
+    // ── One rule function per field: returns an error string, or "" if valid ──
+    function getNameError(input) {
+      const v = input.validity;
+      if (v.valueMissing || input.value.trim() === '') return 'Full name is required';
+      if (v.tooShort) return 'Name must be at least 2 characters';
+      return '';
+    }
+
+    function getSidError(input) {
+      if (input.validity.valueMissing) return 'Student ID is required';
+      if (!SID_REGEX.test(input.value)) return 'Student ID must be exactly 9 digits';
+      return '';
+    }
+
+    function getEmailError(input) {
+      const v = input.validity;
+      if (v.valueMissing) return 'Email is required';
+      if (v.typeMismatch || !EMAIL_REGEX.test(input.value)) return 'Enter a valid email address, e.g. you@gachon.ac.kr';
+      return '';
+    }
+
+    function getPasswordError(input) {
+      const v = input.validity;
+      if (v.valueMissing) return 'Password is required';
+      if (v.tooShort) return 'Password must be at least 8 characters';
+      if (!UPPERCASE_REGEX.test(input.value)) return 'Password needs at least 1 uppercase letter';
+      if (!DIGIT_REGEX.test(input.value)) return 'Password needs at least 1 number';
+      return '';
+    }
+
+    function getConfirmError(input) {
+      if (input.value === '') return 'Please confirm your password';
+      if (input.value !== pw.value) return 'Passwords do not match';
+      return '';
+    }
+
+    const rules = {
+      sname: getNameError,
+      sid: getSidError,
+      semail: getEmailError,
+      pw: getPasswordError,
+      pw2: getConfirmError,
+    };
+
+    // ── Show / clear an inline error ──
+    function showError(input, msg) {
+      const errorEl = document.getElementById(input.id + '-error');
+      errorEl.textContent = msg;
+      input.setAttribute('aria-invalid', msg ? 'true' : 'false');
+    }
+
+    function clearError(input) {
+      document.getElementById(input.id + '-error').textContent = '';
+      input.removeAttribute('aria-invalid');
+    }
+
+    // Run the field's rule, store it in the validity API, update the UI
+    function validateField(input) {
+      // Clear any old custom error first so validity.* reflects the HTML rules
+      input.setCustomValidity('');
+      const msg = rules[input.id](input);
+      input.setCustomValidity(msg);
+      showError(input, msg);
+      return msg === '';
+    }
+
+    // ── Real-time feedback on every keystroke ──
+    fields.forEach(input => {
+      input.addEventListener('input', () => {
+        validateField(input);
+        success.style.display = 'none';
+      });
+    });
+
+    // Changing the password can break (or fix) the confirmation match
+    pw.addEventListener('input', () => {
+      if (pw2.value !== '') validateField(pw2);
+    });
+
+    // ── Submit ──
+    form.addEventListener('submit', (event) => {
+      // Stop the browser reload — we decide what happens
+      event.preventDefault();
+
+      fields.forEach(validateField);
+
+      if (!form.checkValidity()) {
+        form.querySelector('[aria-invalid="true"]').focus();
+        success.style.display = 'none';
+        return;
+      }
+
+      // No backend for this site, so show a confirmation instead of form.submit()
+      success.textContent = `✓ Welcome, ${sname.value.trim()}! Student ${sid.value} is registered.`;
+      success.style.display = 'block';
+
+      form.reset();
+      fields.forEach(clearError);
+    });
+  </script>
+</body>
+</html>
