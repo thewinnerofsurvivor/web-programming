@@ -1,22 +1,40 @@
-/* ─────────────────────────────────────────────
-   TYPOGRAPHY STYLES
-   Used on all pages — last updated 2026-09-14
-───────────────────────────────────────────── */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    /* ─────────────────────────────────────────────
+       TYPOGRAPHY STYLES
+       Used on all pages — last updated 2026-09-14
+    ───────────────────────────────────────────── */
 
-body {
-  font-family: 'Inter', sans-serif;
-  font-size: 1rem;
-  line-height: 1.7;
-  /* color: red; */   /* temporarily disabled — was too harsh */
-  color: #1e293b;
-}
+    body {
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      line-height: 1.7;
+      /* color: red; */   /* temporarily disabled — was too harsh */
+      color: #1e293b;
+    }
 
-/* Navigation */
-nav { display: flex; gap: 16px; } /* horizontal layout */
+    /* Navigation */
+    nav { display: flex; gap: 16px; } /* horizontal layout */
 
-/* TODO: add mobile breakpoint here */
-/* @media (max-width: 768px) { ... } */
+    /* TODO: add mobile breakpoint here */
+    /* @media (max-width: 768px) { ... } */
 
-/* These do NOT work in CSS: */
-/* // This is NOT a CSS comment — JavaScript only */
-/* <!-- This is NOT a CSS comment — HTML only --> */
+    /* These do NOT work in CSS: */
+    /* // This is NOT a CSS comment — JavaScript only */
+    /* <!-- This is NOT a CSS comment — HTML only --> */
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="#">Home</a>
+    <a href="#">About</a>
+    <a href="#">Contact</a>
+  </nav>
+  <h1>CSS Comments</h1>
+  <p>CSS comments are written between /* and */. The browser ignores them, so they are useful for notes, section headers and temporarily disabling a rule.</p>
+  <p>This text is dark slate, not red, because the color: red; line is commented out.</p>
+</body>
+</html>

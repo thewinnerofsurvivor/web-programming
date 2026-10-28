@@ -1,22 +1,37 @@
-/* Basic CSS rule anatomy */
-selector {
-    property: value;
-    property: value;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    /* Basic CSS rule anatomy */
+    /*
+    selector {
+        property: value;
+        property: value;
+    }
+    */
 
-/* Real Examples */
-h1 {
-    color: #15803d; /* Text colour */
-    font-size: 2rem; /* Size */
-    font-weight: bold; /* Weight */
-    text-align: center; /* Alignment */
-}
+    /* Real Examples */
+    h1 {
+      color: #15803d;      /* Text colour */
+      font-size: 2rem;     /* Size */
+      font-weight: bold;   /* Weight */
+      text-align: center;  /* Alignment */
+    }
 
-p {
-    line-height: 1.7; /* Space between Lines */
-    max-width: 65ch; /* Column Width */
-}
+    p {
+      line-height: 1.7;    /* Space between Lines */
+      max-width: 65ch;     /* Column Width */
+    }
 
-/* Common Mistakes */
-/* h1 { color = red }
-/* h1 { color: red }
+    /* Common Mistakes */
+    /* h1 { color = red }   -> wrong: uses = instead of : */
+    /* h1 { color: red }    -> right */
+  </style>
+</head>
+<body>
+  <h1>CSS Syntax</h1>
+  <p>Every CSS rule has a selector followed by curly braces. Inside the braces are declarations, each written as property: value; and ended with a semicolon.</p>
+  <p>This heading is green, bold and centered, and these paragraphs have a comfortable line height and a limited column width, all set by the rules in the style block.</p>
+</body>
+</html>

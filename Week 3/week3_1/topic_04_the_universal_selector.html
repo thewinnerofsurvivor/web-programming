@@ -1,20 +1,37 @@
-/* The Classic CSS Reset using */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    /* The Classic CSS Reset using */
+    *, *::before, *::after {
+      box-sizing: border-box; /* -> This means padding and border will be calculated into the width. */
+      margin: 0;
+      padding: 0;
+    }
 
-*, *::before, *::after {
-    box-sizing: border-box; /* -> This means padding and border will be calculated into the width. */
-    margin: 0;
-    padding: 0;
-}
+    /* Now you add styles on top cleanly */
+    body {
+      font-family: 'Inter', sans-serif;
+      line-height: 1.6;
+      background: #f8fafc;
+      color: #1e293b;
+    }
 
-/* Now you add styles on top cleanly */
-body {
-    font-family: 'Inter', sans-serif;
-    line-height: 1.6;
-    background: #f8fafc;
-    color: #1e293b;
-}
-
-/* Avoid doing this as it affects every element */
-* {
-    color: blue
-}
+    /* Avoid doing this as it affects every element */
+    /*
+    * {
+      color: blue
+    }
+    */
+  </style>
+</head>
+<body>
+  <h1>The Universal Selector</h1>
+  <p>The * selector matches every element on the page. Here it is used as a reset, removing the browser's default margins and padding.</p>
+  <ul>
+    <li>Notice the list has no indentation</li>
+    <li>And the heading has no space above it</li>
+  </ul>
+</body>
+</html>
