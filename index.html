@@ -37,6 +37,64 @@
             color: #666;
         }
 
+        /* Featured assignments */
+        .assignments {
+            margin-bottom: 2rem;
+        }
+
+        .assignments > h2 {
+            font-size: 1.25rem;
+            color: #222;
+            border-bottom: none;
+            margin: 0 0 0.75rem;
+            padding: 0;
+        }
+
+        .assignment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        a.assignment-card {
+            display: block;
+            background-color: #fff;
+            border: 1px solid #dde1e6;
+            border-left: 5px solid #0b63c4;
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            color: #222;
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+
+        a.assignment-card:hover {
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .assignment-card .tag {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #0b63c4;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .assignment-card .title {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0.25rem 0;
+        }
+
+        .assignment-card .desc {
+            display: block;
+            font-size: 0.875rem;
+            color: #666;
+        }
+
         /* Week dropdown */
         details.week {
             background-color: #fff;
@@ -118,6 +176,38 @@
             <h1>Web Programming Exercises</h1>
             <p>A showcase of my HTML &amp; CSS exercises, organized by week.</p>
         </header>
+
+        <!-- Assignments (featured) -->
+        <section class="assignments">
+            <h2>Assignments</h2>
+            <div class="assignment-grid">
+                <a class="assignment-card" href="Assignment/Team%2016%20%E2%80%93%20Gachon%20WIND%20CCA%20Website%20Proposal.pptx" download>
+                    <span class="tag">Team Project &middot; Slides</span>
+                    <span class="title">Gachon WIND CCA Website Proposal</span>
+                    <span class="desc">Team 16 proposal deck (PowerPoint, 8 MB download).</span>
+                </a>
+                <a class="assignment-card" href="Assignment/WhatsApp%20Video%202026-10-26%20at%205.36.43%20PM.mp4" target="_blank" rel="noopener">
+                    <span class="tag">Team Project &middot; Video</span>
+                    <span class="title">Proposal Video</span>
+                    <span class="desc">Video recorded 26 Oct 2026 (MP4, 77 MB).</span>
+                </a>
+                <a class="assignment-card" href="Week%206/week6_1/assignment_contact_form.html">
+                    <span class="tag">Week 6 &middot; Monday</span>
+                    <span class="title">Contact Form</span>
+                    <span class="desc">HTML5 validation attributes with :valid / :invalid styling.</span>
+                </a>
+                <a class="assignment-card" href="Week%207/Random%20Joke%20Generator/assignment_random_joke_fetcher.html">
+                    <span class="tag">Week 7</span>
+                    <span class="title">Random Joke Fetcher</span>
+                    <span class="desc">Fetch API, async/await and saved favourites.</span>
+                </a>
+                <a class="assignment-card" href="Week%206/week6_2/assignment_registration_form.html">
+                    <span class="tag">Week 6 &middot; Friday</span>
+                    <span class="title">Registration Form</span>
+                    <span class="desc">Full JS validation with inline, accessible error messages.</span>
+                </a>
+            </div>
+        </section>
 
         <!-- Week 2 -->
         <details class="week">
@@ -237,8 +327,18 @@
 
                 <h2>Friday &ndash; Assignment</h2>
                 <ul>
-                    <li><a href="Week%206/week6_2/assignment_random_joke_fetcher.html">Random Joke Fetcher</a></li>
                     <li><a href="Week%206/week6_2/assignment_registration_form.html">Registration Form (JS Validation)</a></li>
+                </ul>
+            </div>
+        </details>
+
+        <!-- Week 7 -->
+        <details class="week">
+            <summary>Week 7</summary>
+            <div class="week-content">
+                <h2>Assignment</h2>
+                <ul>
+                    <li><a href="Week%207/Random%20Joke%20Generator/assignment_random_joke_fetcher.html">Random Joke Fetcher</a></li>
                 </ul>
             </div>
         </details>
