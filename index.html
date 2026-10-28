@@ -56,7 +56,7 @@
             gap: 1rem;
         }
 
-        a.assignment-card {
+        .assignment-card {
             display: block;
             background-color: #fff;
             border: 1px solid #dde1e6;
@@ -71,6 +71,20 @@
             text-decoration: none;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             transform: translateY(-2px);
+        }
+
+        /* Video card spans the full row */
+        .video-card {
+            grid-column: 1 / -1;
+        }
+
+        .video-card video {
+            display: block;
+            width: 100%;
+            max-height: 70vh;
+            margin-top: 0.5rem;
+            border-radius: 6px;
+            background-color: #000;
         }
 
         .assignment-card .tag {
@@ -181,30 +195,20 @@
         <section class="assignments">
             <h2>Assignments</h2>
             <div class="assignment-grid">
+                <div class="assignment-card video-card">
+                    <span class="tag">Team Project &middot; Video</span>
+                    <span class="title">Proposal Video</span>
+                    <!-- preload="metadata": only fetch the 77 MB file once Play is pressed -->
+                    <video controls preload="metadata" playsinline>
+                        <source src="Assignment/WhatsApp%20Video%202026-10-26%20at%205.36.43%20PM.mp4" type="video/mp4">
+                        Your browser can't play this video.
+                        <a href="Assignment/WhatsApp%20Video%202026-10-26%20at%205.36.43%20PM.mp4">Download it instead</a>.
+                    </video>
+                </div>
                 <a class="assignment-card" href="Assignment/Team%2016%20%E2%80%93%20Gachon%20WIND%20CCA%20Website%20Proposal.pptx" download>
                     <span class="tag">Team Project &middot; Slides</span>
                     <span class="title">Gachon WIND CCA Website Proposal</span>
                     <span class="desc">Team 16 proposal deck (PowerPoint, 8 MB download).</span>
-                </a>
-                <a class="assignment-card" href="Assignment/WhatsApp%20Video%202026-10-26%20at%205.36.43%20PM.mp4" target="_blank" rel="noopener">
-                    <span class="tag">Team Project &middot; Video</span>
-                    <span class="title">Proposal Video</span>
-                    <span class="desc">Video recorded 26 Oct 2026 (MP4, 77 MB).</span>
-                </a>
-                <a class="assignment-card" href="Week%206/week6_1/assignment_contact_form.html">
-                    <span class="tag">Week 6 &middot; Monday</span>
-                    <span class="title">Contact Form</span>
-                    <span class="desc">HTML5 validation attributes with :valid / :invalid styling.</span>
-                </a>
-                <a class="assignment-card" href="Week%207/Random%20Joke%20Generator/assignment_random_joke_fetcher.html">
-                    <span class="tag">Week 7</span>
-                    <span class="title">Random Joke Fetcher</span>
-                    <span class="desc">Fetch API, async/await and saved favourites.</span>
-                </a>
-                <a class="assignment-card" href="Week%206/week6_2/assignment_registration_form.html">
-                    <span class="tag">Week 6 &middot; Friday</span>
-                    <span class="title">Registration Form</span>
-                    <span class="desc">Full JS validation with inline, accessible error messages.</span>
                 </a>
             </div>
         </section>
