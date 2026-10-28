@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>innerHTML</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+
+    .row {
+      display: flex;
+      gap: 16px;
+    }
+
+    .panel {
+      flex: 1;
+      padding: 16px;
+      border-radius: 8px;
+    }
+
+    .safe { background: #ecfdf5; border: 2px solid #10B981; }
+    .risky { background: #fee2e2; border: 2px solid #dc2626; }
+
+    .output {
+      background: white;
+      padding: 10px;
+      border-radius: 6px;
+      margin: 8px 0;
+      min-height: 40px;
+    }
+  </style>
+</head>
+<body>
+  <div class="row">
+    <div class="panel safe">
+      <strong>textContent (safe)</strong>
+      <div id="tc-demo" class="output">Click the button</div>
+      <button onclick="setText()">Set textContent</button>
+    </div>
+
+    <div class="panel risky">
+      <strong>innerHTML (powerful but risky)</strong>
+      <div id="ih-demo" class="output">Click the button</div>
+      <button onclick="setHTML()">Set innerHTML</button>
+    </div>
+  </div>
+
+  <p>Never put user input into innerHTML. An attacker could type
+    <code>&lt;img src=x onerror="alert('hacked!')"&gt;</code> and their script would run (XSS).</p>
+
+  <script>
+    // textContent shows the tags as plain text
+    function setText() {
+      document.getElementById('tc-demo').textContent = '<b>Am I bold?</b> No!';
+    }
+
+    // innerHTML parses the tags — only use with content YOU control
+    function setHTML() {
+      document.getElementById('ih-demo').innerHTML = '<b>I AM bold!</b>';
+    }
+  </script>
+</body>
+</html>

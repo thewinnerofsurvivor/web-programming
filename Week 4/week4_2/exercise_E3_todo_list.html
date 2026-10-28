@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>E3 – To-Do List</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: sans-serif;
+        background-color: lightgreen;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding-top: 60px;
+    }
+
+    .card {
+        background-color: white;
+        border-radius: 12px;
+        padding: 32px;
+        width: 360px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    h2 {
+        color: #15803d;
+        margin-bottom: 16px;
+    }
+
+    .add-row {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 16px;
+    }
+
+    input {
+        flex: 1;
+        padding: 8px 12px;
+        border: 2px solid #10B981;
+        border-radius: 8px;
+        font-size: 15px;
+    }
+
+    button {
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .add-btn {
+        background-color: #10B981;
+        color: white;
+        padding: 8px 16px;
+    }
+
+    #todo-list {
+        list-style: none;
+    }
+
+    .todo-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 14px;
+        margin-bottom: 6px;
+        background-color: #ecfdf5;
+        border-left: 5px solid #10B981;
+        border-radius: 6px;
+    }
+
+    .del-btn {
+        background-color: #dc2626;
+        color: white;
+        padding: 4px 10px;
+        font-size: 12px;
+    }
+
+    #empty-msg {
+        color: #9ca3af;
+        text-align: center;
+        padding: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>My To-Do List</h2>
+    <div class="add-row">
+      <input id="todo-input" type="text" placeholder="Add a task...">
+      <button id="add-btn" class="add-btn">+ Add</button>
+    </div>
+    <ul id="todo-list"></ul>
+    <p id="empty-msg">No tasks yet! Add one above.</p>
+  </div>
+
+  <script>
+    const input = document.querySelector('#todo-input');
+    const addBtn = document.querySelector('#add-btn');
+    const list = document.querySelector('#todo-list');
+    const emptyMsg = document.querySelector('#empty-msg');
+
+    function updateEmpty() {
+      emptyMsg.style.display = list.children.length === 0 ? 'block' : 'none';
+    }
+
+    function addTask() {
+      const text = input.value.trim();
+      if (!text) return;
+
+      const li = document.createElement('li');
+      li.className = 'todo-item';
+
+      // textContent keeps user input safe (no HTML injection)
+      const span = document.createElement('span');
+      span.textContent = text;
+
+      const delBtn = document.createElement('button');
+      delBtn.className = 'del-btn';
+      delBtn.textContent = '✕';
+
+      li.appendChild(span);
+      li.appendChild(delBtn);
+      list.appendChild(li);
+
+      input.value = '';
+      updateEmpty();
+    }
+
+    addBtn.addEventListener('click', addTask);
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') addTask();
+    });
+
+    // Event delegation — one listener handles every delete button
+    list.addEventListener('click', (e) => {
+      if (e.target.classList.contains('del-btn')) {
+        e.target.closest('li').remove();
+        updateEmpty();
+      }
+    });
+
+    updateEmpty();
+  </script>
+</body>
+</html>

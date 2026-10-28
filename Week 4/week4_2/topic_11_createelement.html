@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>createElement &amp; appendChild</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+
+    input {
+      padding: 8px;
+      border: 2px solid #10B981;
+      border-radius: 6px;
+    }
+
+    button {
+      background: #10B981;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    #my-list { padding: 0; list-style: none; }
+
+    .list-item {
+      background: #ecfdf5;
+      border-left: 5px solid #10B981;
+      padding: 8px 12px;
+      margin-bottom: 6px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <input id="new-item" type="text" placeholder="Type a new item...">
+  <button onclick="addItem('end')">Append (end)</button>
+  <button onclick="addItem('start')">Prepend (start)</button>
+
+  <ul id="my-list">
+    <li class="list-item">Learn HTML</li>
+  </ul>
+
+  <script>
+    function addItem(position) {
+      const input = document.querySelector('#new-item');
+      if (input.value.trim() === '') return;
+
+      // Step 1: Create
+      const li = document.createElement('li');
+
+      // Step 2: Configure
+      li.textContent = input.value;
+      li.classList.add('list-item');
+
+      // Step 3: Append to the DOM
+      const ul = document.querySelector('#my-list');
+      if (position === 'end') {
+        ul.appendChild(li);
+      } else {
+        ul.prepend(li);
+      }
+
+      input.value = '';
+    }
+  </script>
+</body>
+</html>

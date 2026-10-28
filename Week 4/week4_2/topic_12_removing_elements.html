@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Removing Elements</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+
+    #my-list { padding: 0; list-style: none; }
+
+    #my-list li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #ecfdf5;
+      border: 1px solid #10B981;
+      padding: 8px 12px;
+      margin-bottom: 6px;
+      border-radius: 6px;
+    }
+
+    .delete-btn {
+      background: #dc2626;
+      color: white;
+      border: none;
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #restore {
+      background: #10B981;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <ul id="my-list"></ul>
+  <button id="restore">Restore items</button>
+
+  <script>
+    const list = document.querySelector('#my-list');
+
+    function restore() {
+      list.innerHTML = `
+        <li><span>Item One</span><button class="delete-btn">✕ Remove</button></li>
+        <li><span>Item Two</span><button class="delete-btn">✕ Remove</button></li>
+        <li><span>Item Three</span><button class="delete-btn">✕ Remove</button></li>`;
+    }
+
+    // Remove the parent li when a delete button is clicked
+    list.addEventListener('click', (e) => {
+      if (e.target.matches('.delete-btn')) {
+        e.target.closest('li').remove(); // gone!
+      }
+    });
+
+    document.querySelector('#restore').addEventListener('click', restore);
+    restore();
+  </script>
+</body>
+</html>

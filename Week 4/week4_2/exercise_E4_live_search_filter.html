@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>E4 – Live Search Filter</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: sans-serif;
+        background-color: lightgreen;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding-top: 60px;
+    }
+
+    .card {
+        background-color: white;
+        border-radius: 12px;
+        padding: 32px;
+        width: 400px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    h2 {
+        color: #15803d;
+        margin-bottom: 16px;
+    }
+
+    #search {
+        width: 100%;
+        padding: 10px 14px;
+        font-size: 16px;
+        border: 2px solid #10B981;
+        border-radius: 10px;
+        margin-bottom: 14px;
+    }
+
+    .student {
+        padding: 10px 14px;
+        margin-bottom: 6px;
+        background-color: #ecfdf5;
+        border-left: 5px solid #10B981;
+        border-radius: 6px;
+    }
+
+    .course {
+        color: #6b7280;
+    }
+
+    mark {
+        background-color: #10B981;
+        color: white;
+        border-radius: 3px;
+    }
+
+    #no-results {
+        display: none;
+        color: #9ca3af;
+        text-align: center;
+        padding: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Student Search</h2>
+    <input id="search" type="text" placeholder="Search students...">
+
+    <div id="student-list">
+      <div class="student" data-name="Kim Jisoo" data-course="Web Programming"></div>
+      <div class="student" data-name="Park Minjun" data-course="Computer Science"></div>
+      <div class="student" data-name="Lee Sooyeon" data-course="Software Engineering"></div>
+      <div class="student" data-name="Choi Hyunwoo" data-course="Artificial Intelligence"></div>
+      <div class="student" data-name="Jung Yuna" data-course="Data Science"></div>
+      <div class="student" data-name="Kang Seojun" data-course="Web Programming"></div>
+    </div>
+    <p id="no-results">No students found.</p>
+  </div>
+
+  <script>
+    const searchInp = document.querySelector('#search');
+    const students = document.querySelectorAll('.student');
+    const noResults = document.querySelector('#no-results');
+
+    // Fill a student row, wrapping the matched part of the name in <mark>.
+    // Built with createElement + textContent so typed text is never parsed as HTML.
+    function render(student, term) {
+      const name = student.dataset.name;
+      const start = term ? name.toLowerCase().indexOf(term) : -1;
+
+      student.textContent = '';
+
+      if (start === -1) {
+        student.append(name);
+      } else {
+        const mark = document.createElement('mark');
+        mark.textContent = name.slice(start, start + term.length);
+        student.append(name.slice(0, start), mark, name.slice(start + term.length));
+      }
+
+      const course = document.createElement('span');
+      course.className = 'course';
+      course.textContent = ' — ' + student.dataset.course;
+      student.append(course);
+    }
+
+    searchInp.addEventListener('input', (e) => {
+      const term = e.target.value.toLowerCase();
+      let visible = 0;
+
+      students.forEach(student => {
+        const name = student.dataset.name.toLowerCase();
+
+        if (name.includes(term)) {
+          student.style.display = '';
+          render(student, term);
+          visible++;
+        } else {
+          student.style.display = 'none';
+        }
+      });
+
+      noResults.style.display = visible === 0 ? 'block' : 'none';
+    });
+
+    students.forEach(student => render(student, ''));
+  </script>
+</body>
+</html>

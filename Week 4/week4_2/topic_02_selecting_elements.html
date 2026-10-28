@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Selecting Elements</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+
+    #greeting {
+      font-size: 1.5rem;
+      padding: 16px;
+      border: 2px dashed #10B981;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    button {
+      background: #10B981;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <p id="greeting">I am the element with id="greeting"</p>
+
+  <button onclick="changeText()">Change Text</button>
+  <button onclick="changeColor()">Change Color</button>
+  <button onclick="reset()">Reset</button>
+
+  <script>
+    // getElementById returns ONE element (or null if nothing matches)
+    const heading = document.getElementById('greeting');
+
+    function changeText() {
+      heading.textContent = 'Hello, class!';
+    }
+
+    function changeColor() {
+      heading.style.color = '#15803d';
+      heading.style.background = '#ecfdf5';
+    }
+
+    function reset() {
+      heading.textContent = 'I am the element with id="greeting"';
+      heading.style.color = '';
+      heading.style.background = '';
+    }
+  </script>
+</body>
+</html>

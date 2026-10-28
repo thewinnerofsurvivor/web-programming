@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>preventDefault</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+
+    form {
+      background: #ecfdf5;
+      border: 2px solid #10B981;
+      border-radius: 8px;
+      padding: 16px;
+      max-width: 320px;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 8px;
+      box-sizing: border-box;
+    }
+
+    button {
+      background: #10B981;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .error { color: #dc2626; }
+    .success { color: #15803d; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <form id="login-form">
+    <input id="email" type="text" placeholder="Email">
+    <button type="submit">Log in</button>
+    <p id="result"></p>
+  </form>
+
+  <script>
+    const form = document.querySelector('#login-form');
+    const result = document.querySelector('#result');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault(); // stops the page reload!
+
+      // Now validate the form with JavaScript
+      const email = document.querySelector('#email').value;
+
+      if (!email.includes('@')) {
+        result.className = 'error';
+        result.textContent = 'Please enter a valid email.';
+      } else {
+        result.className = 'success';
+        result.textContent = 'Logged in as ' + email + ' — no page reload!';
+      }
+    });
+  </script>
+</body>
+</html>

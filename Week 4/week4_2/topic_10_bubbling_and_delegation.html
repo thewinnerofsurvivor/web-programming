@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Event Bubbling &amp; Delegation</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+
+    #container {
+      background: #ecfdf5;
+      border: 2px solid #10B981;
+      padding: 20px;
+      border-radius: 8px;
+    }
+
+    #inner-btn {
+      background: #10B981;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    #todo-list li { margin-bottom: 4px; }
+
+    .delete-btn {
+      background: #dc2626;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h3>1. Bubbling</h3>
+  <div id="container">
+    div#container
+    <button id="inner-btn">Click me!</button>
+  </div>
+  <ol id="bubble-log"></ol>
+
+  <h3>2. Delegation</h3>
+  <ul id="todo-list">
+    <li>Learn HTML <button class="delete-btn">✕</button></li>
+    <li>Learn CSS <button class="delete-btn">✕</button></li>
+    <li>Learn JavaScript <button class="delete-btn">✕</button></li>
+  </ul>
+
+  <script>
+    // Bubbling: one click fires on the button, then each parent
+    function logReached(name) {
+      const li = document.createElement('li');
+      li.textContent = 'Event reached: ' + name;
+      document.querySelector('#bubble-log').appendChild(li);
+    }
+
+    document.querySelector('#inner-btn').addEventListener('click', () => {
+      document.querySelector('#bubble-log').innerHTML = '';
+      logReached('button');
+    });
+    document.querySelector('#container').addEventListener('click', (e) => {
+      if (e.target.id === 'inner-btn') logReached('div#container');
+    });
+    document.body.addEventListener('click', (e) => {
+      if (e.target.id === 'inner-btn') logReached('body');
+    });
+
+    // Delegation: ONE listener on the parent handles every delete button
+    const list = document.querySelector('#todo-list');
+    list.addEventListener('click', (e) => {
+      if (e.target.matches('.delete-btn')) {
+        e.target.parentElement.remove();
+      }
+    });
+  </script>
+</body>
+</html>

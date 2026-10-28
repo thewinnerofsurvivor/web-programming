@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>querySelector &amp; querySelectorAll</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+
+    #main-title { color: #15803d; }
+
+    .list-item {
+      padding: 6px 10px;
+      margin-bottom: 4px;
+      border-radius: 6px;
+    }
+
+    button {
+      background: #10B981;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="main-title">querySelector Demo</h1>
+
+  <ul>
+    <li class="list-item">HTML</li>
+    <li class="list-item">CSS</li>
+    <li class="list-item">JavaScript</li>
+  </ul>
+
+  <button onclick="highlightFirst()">querySelector (first)</button>
+  <button onclick="highlightAll()">querySelectorAll (all)</button>
+
+  <script>
+    // querySelector — returns the FIRST match
+    function highlightFirst() {
+      const first = document.querySelector('.list-item');
+      first.style.background = '#ecfdf5';
+    }
+
+    // querySelectorAll — returns ALL matches as a NodeList
+    function highlightAll() {
+      const items = document.querySelectorAll('.list-item');
+      items.forEach(item => {
+        item.style.background = '#10B981';
+        item.style.color = 'white';
+      });
+    }
+  </script>
+</body>
+</html>

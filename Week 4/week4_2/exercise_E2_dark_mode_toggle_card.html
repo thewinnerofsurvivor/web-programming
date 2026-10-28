@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>E2 – Dark Mode Toggle Card</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: sans-serif;
+        background-color: lightgreen;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .card {
+        background-color: white;
+        border-radius: 12px;
+        padding: 32px;
+        width: 280px;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s;
+    }
+
+    .card.dark {
+        background-color: #1e293b;
+        color: white;
+    }
+
+    .avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background-color: #10B981;
+        color: white;
+        font-size: 2rem;
+        font-weight: bold;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0 auto 16px;
+    }
+
+    .name {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 4px;
+    }
+
+    .role {
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
+
+    .card.dark .role {
+        color: #86efac;
+    }
+
+    #toggle-btn {
+        margin-top: 16px;
+        padding: 8px 20px;
+        border: none;
+        border-radius: 999px;
+        background-color: #10B981;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="card" class="card">
+    <div class="avatar">YW</div>
+    <h2 class="name">Ooi Yong Wee</h2>
+    <p class="role">Web Programming Student</p>
+    <button id="toggle-btn">🌙 Dark Mode</button>
+  </div>
+
+  <script>
+    const card = document.querySelector('#card');
+    const btn = document.querySelector('#toggle-btn');
+
+    btn.addEventListener('click', () => {
+      card.classList.toggle('dark');
+
+      if (card.classList.contains('dark')) {
+        btn.textContent = '☀️ Light Mode';
+      } else {
+        btn.textContent = '🌙 Dark Mode';
+      }
+    });
+  </script>
+</body>
+</html>

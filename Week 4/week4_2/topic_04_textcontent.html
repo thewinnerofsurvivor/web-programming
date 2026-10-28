@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>textContent</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+
+    #msg { color: #15803d; }
+
+    input {
+      padding: 8px;
+      font-size: 16px;
+      width: 220px;
+      border: 2px solid #10B981;
+      border-radius: 6px;
+    }
+
+    button {
+      background: #10B981;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h2 id="msg">Original Text</h2>
+  <p>Current text: <span id="current"></span></p>
+
+  <input id="inp" type="text" placeholder="Try typing <b>bold</b>">
+  <button onclick="changeText()">Change Text</button>
+
+  <script>
+    const msg = document.getElementById('msg');
+
+    // READ the current text
+    document.getElementById('current').textContent = msg.textContent;
+
+    // WRITE new text — HTML tags are shown as plain text (safe!)
+    function changeText() {
+      msg.textContent = document.getElementById('inp').value;
+      document.getElementById('current').textContent = msg.textContent;
+    }
+  </script>
+</body>
+</html>

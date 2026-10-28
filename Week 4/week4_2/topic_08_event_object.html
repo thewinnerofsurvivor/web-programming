@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>The Event Object</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+
+    button {
+      background: #10B981;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    input {
+      padding: 8px;
+      border: 2px solid #10B981;
+      border-radius: 6px;
+    }
+
+    #log {
+      background: #1e293b;
+      color: #86efac;
+      font-family: monospace;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 12px;
+      min-height: 100px;
+    }
+  </style>
+</head>
+<body>
+  <button id="btn-a">Button A</button>
+  <button id="btn-b">Button B</button>
+  <input id="typer" type="text" placeholder="Type here (keydown)...">
+
+  <div id="log">Event log (last 5 events)</div>
+
+  <script>
+    const log = document.querySelector('#log');
+
+    function addLog(text) {
+      const line = document.createElement('div');
+      line.textContent = text;
+      log.appendChild(line);
+
+      // keep only the last 5 lines
+      if (log.children.length > 5) log.firstElementChild.remove();
+    }
+
+    // 'e' is the event object, passed in automatically
+    document.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        addLog(e.type + ' on #' + e.target.id + ' — "' + e.target.textContent + '"');
+      });
+    });
+
+    // Keyboard events have e.key
+    document.querySelector('#typer').addEventListener('keydown', (e) => {
+      addLog(e.type + ' — e.key = "' + e.key + '"');
+    });
+  </script>
+</body>
+</html>

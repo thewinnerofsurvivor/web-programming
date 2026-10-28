@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>classList</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+
+    .card {
+      padding: 20px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+
+    /* CSS controls what each class looks like */
+    .highlighted { background: #10B981; color: white; border-color: #10B981; }
+    .rounded { border-radius: 50px; }
+    .shadowed { box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); }
+
+    button { margin-top: 10px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div id="box" class="card">I am the demo box</div>
+
+  <button onclick="run('add', 'highlighted')">add('highlighted')</button>
+  <button onclick="run('remove', 'highlighted')">remove('highlighted')</button>
+  <button onclick="run('toggle', 'rounded')">toggle('rounded')</button>
+  <button onclick="run('toggle', 'shadowed')">toggle('shadowed')</button>
+
+  <p>Classes: <code id="classes">card</code></p>
+  <p>contains('highlighted') → <code id="contains">false</code></p>
+
+  <script>
+    const box = document.getElementById('box');
+
+    // JS controls WHEN a class is applied
+    function run(method, className) {
+      box.classList[method](className);
+
+      document.getElementById('classes').textContent = box.className;
+      document.getElementById('contains').textContent = box.classList.contains('highlighted');
+    }
+  </script>
+</body>
+</html>

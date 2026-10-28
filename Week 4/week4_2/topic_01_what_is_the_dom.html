@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>What is the DOM?</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+
+    #title { color: #15803d; }
+
+    /* The tree printed by JavaScript */
+    #tree {
+      background: #ecfdf5;
+      border-left: 5px solid #10B981;
+      padding: 16px;
+      border-radius: 8px;
+      font-family: monospace;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="title">Hello</h1>
+  <p>World</p>
+
+  <h3>This page as a DOM tree:</h3>
+  <pre id="tree"></pre>
+
+  <script>
+    // Every HTML tag is a node in the DOM tree.
+    // 'document' is the root, so we can walk down from it.
+    function printTree(node, indent) {
+      let line = indent + node.tagName.toLowerCase();
+      if (node.id) line += ' id="' + node.id + '"';
+      let text = line + '\n';
+
+      for (const child of node.children) {
+        if (child.tagName !== 'SCRIPT' && child.id !== 'tree') {
+          text += printTree(child, indent + '    ');
+        }
+      }
+      return text;
+    }
+
+    document.getElementById('tree').textContent =
+      'document\n' + printTree(document.documentElement, '└── ');
+  </script>
+</body>
+</html>
