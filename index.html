@@ -235,34 +235,6 @@
             height: 16px;
         }
 
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1px;
-            margin-top: 3rem;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: var(--radius);
-            overflow: hidden;
-            background-color: rgba(255, 255, 255, 0.08);
-        }
-
-        .stat {
-            padding: 1.1rem 1.25rem;
-            background-color: rgba(13, 27, 30, 0.85);
-        }
-
-        .stat strong {
-            display: block;
-            font-size: 1.75rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-        }
-
-        .stat span {
-            font-size: 0.85rem;
-            color: var(--hero-ink-2);
-        }
-
         /* ---------- Sections ---------- */
         section.block {
             padding: 4rem 0 0;
@@ -670,10 +642,6 @@
             .featured {
                 grid-template-columns: 1fr;
             }
-
-            .stats {
-                grid-template-columns: repeat(2, 1fr);
-            }
         }
 
         @media (max-width: 560px) {
@@ -732,13 +700,6 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
                 </a>
                 <a class="btn btn-ghost" href="#coursework">Browse coursework</a>
-            </div>
-
-            <div class="stats">
-                <div class="stat"><strong>5</strong><span>Weeks covered</span></div>
-                <div class="stat"><strong>31</strong><span>Exercises &amp; assignments</span></div>
-                <div class="stat"><strong>37</strong><span>Topic walkthroughs</span></div>
-                <div class="stat"><strong>1</strong><span>Team proposal</span></div>
             </div>
         </div>
     </header>
