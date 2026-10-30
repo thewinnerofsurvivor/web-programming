@@ -10,46 +10,28 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <style>
         /* ---------- Design tokens ---------- */
+        /* One dark theme across the page, matching the hero */
         :root {
-            --bg: #f6f4ef;
-            --surface: #ffffff;
-            --surface-2: #f1eee7;
-            --ink: #16181d;
-            --ink-2: #4a4f5a;
-            --ink-3: #80858f;
-            --line: #e4e0d6;
-            --accent: #0f766e;
-            --accent-ink: #0b5952;
-            --accent-soft: #e0f2ef;
-            --warm: #c2410c;
-            --warm-soft: #fdeee4;
+            color-scheme: dark;
+            --bg: #0d1b1e;
+            --surface: rgba(18, 37, 42, 0.82);
+            --surface-2: #183036;
+            --ink: #eef6f4;
+            --ink-2: #b4c8c4;
+            --ink-3: #7f9893;
+            --line: #22393e;
+            --accent: #2dd4bf;
+            --accent-ink: #5eead4;
+            --accent-soft: rgba(45, 212, 191, 0.12);
+            --warm: #fb923c;
+            --warm-soft: rgba(251, 146, 60, 0.12);
             --hero-bg: #0d1b1e;
             --hero-ink: #eef6f4;
             --hero-ink-2: #9fb8b3;
-            --shadow: 0 1px 2px rgba(22, 24, 29, 0.04), 0 4px 16px rgba(22, 24, 29, 0.06);
-            --shadow-lg: 0 2px 4px rgba(22, 24, 29, 0.05), 0 12px 32px rgba(22, 24, 29, 0.10);
+            --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.25);
+            --shadow-lg: 0 2px 4px rgba(0, 0, 0, 0.3), 0 12px 32px rgba(0, 0, 0, 0.4);
             --radius: 14px;
             --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg: #0f1214;
-                --surface: #171b1e;
-                --surface-2: #1d2226;
-                --ink: #eceeef;
-                --ink-2: #b2b8bd;
-                --ink-3: #7d858c;
-                --line: #2a3035;
-                --accent: #2dd4bf;
-                --accent-ink: #5eead4;
-                --accent-soft: rgba(45, 212, 191, 0.12);
-                --warm: #fb923c;
-                --warm-soft: rgba(251, 146, 60, 0.12);
-                --hero-bg: #0a1416;
-                --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.25);
-                --shadow-lg: 0 2px 4px rgba(0, 0, 0, 0.3), 0 12px 32px rgba(0, 0, 0, 0.4);
-            }
         }
 
         /* ---------- Base ---------- */
@@ -69,6 +51,29 @@
             color: var(--ink);
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
+        }
+
+        /* Hero glows and grid, fixed behind the whole page */
+        body::before,
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        body::before {
+            background:
+                radial-gradient(600px 300px at 85% 10%, rgba(20, 184, 166, 0.25), transparent 70%),
+                radial-gradient(500px 260px at 10% 90%, rgba(234, 88, 12, 0.18), transparent 70%);
+        }
+
+        body::after {
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+            background-size: 40px 40px;
         }
 
         a {
@@ -144,39 +149,8 @@
 
         /* ---------- Hero ---------- */
         .hero {
-            position: relative;
-            overflow: hidden;
-            background-color: var(--hero-bg);
             color: var(--hero-ink);
             padding: 4.5rem 0 4rem;
-        }
-
-        .hero::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background:
-                radial-gradient(600px 300px at 85% 10%, rgba(20, 184, 166, 0.25), transparent 70%),
-                radial-gradient(500px 260px at 10% 110%, rgba(234, 88, 12, 0.18), transparent 70%);
-            pointer-events: none;
-        }
-
-        .hero::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background-image:
-                linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
-            background-size: 40px 40px;
-            mask-image: linear-gradient(to bottom, black 30%, transparent);
-            -webkit-mask-image: linear-gradient(to bottom, black 30%, transparent);
-            pointer-events: none;
-        }
-
-        .hero .container {
-            position: relative;
-            z-index: 1;
         }
 
         .eyebrow {
@@ -448,27 +422,6 @@
         .slides-card .cta svg {
             width: 16px;
             height: 16px;
-        }
-
-        .info-card {
-            padding: 1.5rem;
-        }
-
-        .info-card dl {
-            display: grid;
-            grid-template-columns: auto 1fr;
-            gap: 0.5rem 1rem;
-            margin: 0.75rem 0 0;
-            font-size: 0.9rem;
-        }
-
-        .info-card dt {
-            color: var(--ink-3);
-        }
-
-        .info-card dd {
-            margin: 0;
-            font-weight: 600;
         }
 
         /* ---------- Search ---------- */
@@ -837,15 +790,6 @@
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M6 10l6 6 6-6M5 20h14"/></svg>
                             </span>
                         </a>
-
-                        <div class="card info-card">
-                            <span class="tag">At a glance</span>
-                            <dl>
-                                <dt>Team</dt><dd>Team 16</dd>
-                                <dt>Project</dt><dd>Gachon WIND CCA</dd>
-                                <dt>Deliverables</dt><dd>Video &amp; slide deck</dd>
-                            </dl>
-                        </div>
                     </div>
                 </div>
             </div>
