@@ -45,8 +45,35 @@
         font-weight: bold;
     }
 
+    /* Controls: category + new joke */
+    .controls {
+        display: flex;
+        gap: 10px;
+        align-items: stretch;
+    }
+
+    .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+    }
+
+    #category {
+        flex: 0 0 auto;
+        padding: 0 10px;
+        border: 2px solid #10B981;
+        border-radius: 8px;
+        background-color: white;
+        color: #15803d;
+        font-size: 15px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
     #load-btn {
-        width: 100%;
+        flex: 1;
         background-color: #10B981;
         color: white;
         padding: 12px;
@@ -56,6 +83,17 @@
     #load-btn:disabled {
         opacity: 0.6;
         cursor: default;
+    }
+
+    #counter {
+        margin-top: 12px;
+        font-size: 0.85rem;
+        color: #6b7280;
+        text-align: center;
+    }
+
+    #counter strong {
+        color: #15803d;
     }
 
     /* Loading spinner */
@@ -100,15 +138,67 @@
         color: #15803d;
     }
 
-    #save-btn {
+    .joke-type {
+        display: inline-block;
+        font-size: 0.7rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #15803d;
+        background-color: #d1fae5;
+        border-radius: 999px;
+        padding: 2px 8px;
+        margin-bottom: 8px;
+    }
+
+    /* Star rating */
+    .stars {
+        display: inline-flex;
+        gap: 2px;
+        margin-top: 10px;
+    }
+
+    .star {
+        background: none;
+        padding: 0 2px;
+        font-size: 22px;
+        line-height: 1;
+        color: #d1d5db;
+    }
+
+    .star.filled {
+        color: #f59e0b;
+    }
+
+    .star:hover {
+        transform: scale(1.15);
+    }
+
+    #favourites .stars {
+        margin-top: 4px;
+    }
+
+    #favourites .star {
+        font-size: 16px;
+    }
+
+    .joke-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
         margin-top: 12px;
+    }
+
+    #save-btn,
+    #copy-btn {
         background-color: white;
         color: #15803d;
         border: 2px solid #10B981;
         padding: 6px 14px;
     }
 
-    #save-btn:disabled {
+    #save-btn:disabled,
+    #copy-btn:disabled {
         border-color: #d1d5db;
         color: #9ca3af;
         cursor: default;
@@ -177,7 +267,18 @@
     <h1>Random Joke Fetcher</h1>
     <p class="subtitle">Week 6 Assignment · Fetch API &amp; async/await</p>
 
-    <button id="load-btn">Load Joke</button>
+    <div class="controls">
+      <label for="category" class="visually-hidden">Joke category</label>
+      <select id="category">
+        <option value="any">Any</option>
+        <option value="general">General</option>
+        <option value="programming">Programming</option>
+        <option value="knock-knock">Knock-knock</option>
+      </select>
+      <button id="load-btn">New Joke</button>
+    </div>
+
+    <p id="counter">Jokes fetched this session: <strong id="count">0</strong></p>
 
     <div id="loading">
       <div class="spinner"></div>
@@ -185,9 +286,14 @@
     </div>
 
     <div id="joke-area">
+      <span id="joke-type" class="joke-type"></span>
       <p id="setup"></p>
       <p id="punchline"></p>
-      <button id="save-btn">⭐ Save Favourite</button>
+      <div id="current-stars" class="stars" role="group" aria-label="Rate this joke"></div>
+      <div class="joke-actions">
+        <button id="save-btn">⭐ Save Favourite</button>
+        <button id="copy-btn">📋 Copy</button>
+      </div>
     </div>
 
     <p id="error"></p>
@@ -199,39 +305,89 @@
   </div>
 
   <script>
-    const API_URL = 'https://official-joke-api.appspot.com/random_joke';
+    const BASE_URL = 'https://official-joke-api.appspot.com';
     const STORAGE_KEY = 'favouriteJokes';
+    const RATINGS_KEY = 'jokeRatings';
+    const COUNT_KEY = 'jokesFetchedCount';
 
+    const categorySelect = document.querySelector('#category');
     const loadBtn = document.querySelector('#load-btn');
+    const countEl = document.querySelector('#count');
     const loading = document.querySelector('#loading');
     const jokeArea = document.querySelector('#joke-area');
+    const typeEl = document.querySelector('#joke-type');
     const setupEl = document.querySelector('#setup');
     const punchlineEl = document.querySelector('#punchline');
+    const currentStars = document.querySelector('#current-stars');
     const saveBtn = document.querySelector('#save-btn');
+    const copyBtn = document.querySelector('#copy-btn');
     const errorEl = document.querySelector('#error');
     const favList = document.querySelector('#favourites');
     const noFavs = document.querySelector('#no-favourites');
 
     let currentJoke = null;
 
+    // ── Storage helpers (try/catch: storage can be blocked, e.g. private mode) ──
+    function readJSON(storage, key, fallback) {
+      try {
+        return JSON.parse(storage.getItem(key)) ?? fallback;
+      } catch (e) {
+        return fallback;
+      }
+    }
+
+    function writeJSON(storage, key, value) {
+      try {
+        storage.setItem(key, JSON.stringify(value));
+      } catch (e) {
+        // storage blocked — data just won't persist
+      }
+    }
+
+    // ── Session counter (sessionStorage: resets when the tab closes) ──
+    let jokeCount = readJSON(sessionStorage, COUNT_KEY, 0);
+    countEl.textContent = jokeCount;
+
+    function incrementCount() {
+      jokeCount++;
+      writeJSON(sessionStorage, COUNT_KEY, jokeCount);
+      countEl.textContent = jokeCount;
+    }
+
+    // ── Build the endpoint for the chosen category ──
+    function getJokeUrl(category) {
+      if (category === 'any') return `${BASE_URL}/random_joke`;
+      return `${BASE_URL}/jokes/${encodeURIComponent(category)}/random`;
+    }
+
     // ── Fetch a joke ──
     async function loadJoke() {
+      // Show spinner -> fetch -> hide spinner (in finally) -> display data
       loadBtn.disabled = true;
+      categorySelect.disabled = true;
       loading.style.display = 'flex';
       jokeArea.style.display = 'none';
       errorEl.style.display = 'none';
 
       try {
-        const res = await fetch(API_URL);
+        const res = await fetch(getJokeUrl(categorySelect.value));
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
+        let data = await res.json();
 
-        currentJoke = { id: data.id, setup: data.setup, punchline: data.punchline };
+        // Category endpoints return an array with one joke; /random_joke returns an object
+        if (Array.isArray(data)) data = data[0];
+        if (!data || !data.setup) throw new Error('No joke found');
+
+        currentJoke = { id: data.id, type: data.type, setup: data.setup, punchline: data.punchline };
+        incrementCount();
 
         // textContent keeps data from the internet safe (no HTML injection)
+        typeEl.textContent = data.type;
         setupEl.textContent = data.setup;
         punchlineEl.textContent = data.punchline;
+        renderStars(currentStars, currentJoke.id);
         updateSaveButton();
+        resetCopyButton();
         jokeArea.style.display = 'block';
 
       } catch (err) {
@@ -241,25 +397,76 @@
       } finally {
         loading.style.display = 'none';
         loadBtn.disabled = false;
-        loadBtn.textContent = 'Load Another Joke';
+        categorySelect.disabled = false;
       }
+    }
+
+    // ── Star ratings (localStorage: { jokeId: 1-5 }) ──
+    function getRatings() {
+      return readJSON(localStorage, RATINGS_KEY, {});
+    }
+
+    function setRating(id, value) {
+      const ratings = getRatings();
+      // Clicking the current rating again clears it
+      if (ratings[id] === value) delete ratings[id];
+      else ratings[id] = value;
+      writeJSON(localStorage, RATINGS_KEY, ratings);
+    }
+
+    function renderStars(container, id) {
+      const rating = getRatings()[id] || 0;
+      container.innerHTML = '';
+      for (let i = 1; i <= 5; i++) {
+        const star = document.createElement('button');
+        star.className = 'star' + (i <= rating ? ' filled' : '');
+        star.textContent = i <= rating ? '★' : '☆';
+        star.dataset.id = id;
+        star.dataset.value = i;
+        star.setAttribute('aria-label', `Rate ${i} out of 5`);
+        star.setAttribute('aria-pressed', i <= rating);
+        container.appendChild(star);
+      }
+    }
+
+    // Shared by the current joke and the favourites list; returns true if a star was clicked
+    function handleStarClick(e) {
+      const star = e.target.closest('.star');
+      if (!star) return false;
+      setRating(Number(star.dataset.id), Number(star.dataset.value));
+      if (currentJoke) renderStars(currentStars, currentJoke.id);
+      renderFavourites();
+      return true;
+    }
+
+    currentStars.addEventListener('click', handleStarClick);
+
+    // ── Copy to clipboard ──
+    function resetCopyButton() {
+      copyBtn.disabled = false;
+      copyBtn.textContent = '📋 Copy';
+    }
+
+    async function copyJoke() {
+      if (!currentJoke) return;
+      const text = `${currentJoke.setup}\n${currentJoke.punchline}`;
+      try {
+        await navigator.clipboard.writeText(text);
+        copyBtn.textContent = '✓ Copied!';
+      } catch (err) {
+        copyBtn.textContent = '✕ Copy failed';
+      }
+      copyBtn.disabled = true;
+      setTimeout(resetCopyButton, 1500);
     }
 
     // ── Favourites (localStorage) ──
     function getFavourites() {
-      try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-      } catch (e) {
-        return [];
-      }
+      return readJSON(localStorage, STORAGE_KEY, []);
     }
 
     function setFavourites(favs) {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(favs));
-      } catch (e) {
-        // storage blocked (e.g. private mode) — favourites just won't persist
-      }
+      writeJSON(localStorage, STORAGE_KEY, favs);
     }
 
     function isSaved(joke) {
@@ -294,12 +501,18 @@
         const punchline = document.createElement('span');
         punchline.className = 'fav-punchline';
         punchline.textContent = fav.punchline;
-        text.append(setup, punchline);
+        const stars = document.createElement('div');
+        stars.className = 'stars';
+        stars.setAttribute('role', 'group');
+        stars.setAttribute('aria-label', 'Rate this joke');
+        renderStars(stars, fav.id);
+        text.append(setup, punchline, stars);
 
         const removeBtn = document.createElement('button');
         removeBtn.className = 'remove-btn';
         removeBtn.textContent = '✕';
         removeBtn.dataset.id = fav.id;
+        removeBtn.setAttribute('aria-label', 'Remove favourite');
 
         li.append(text, removeBtn);
         favList.appendChild(li);
@@ -308,8 +521,9 @@
       noFavs.style.display = favs.length === 0 ? 'block' : 'none';
     }
 
-    // Event delegation — one listener for every remove button
+    // Event delegation — one listener for every star and remove button in the list
     favList.addEventListener('click', (e) => {
+      if (handleStarClick(e)) return;
       if (e.target.matches('.remove-btn')) {
         const id = Number(e.target.dataset.id);
         setFavourites(getFavourites().filter(fav => fav.id !== id));
@@ -320,7 +534,11 @@
 
     loadBtn.addEventListener('click', loadJoke);
     saveBtn.addEventListener('click', saveFavourite);
+    copyBtn.addEventListener('click', copyJoke);
+
+    // On page load: show saved favourites and fetch the first joke
     renderFavourites();
+    loadJoke();
   </script>
 </body>
 </html>

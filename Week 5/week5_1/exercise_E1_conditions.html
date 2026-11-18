@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E1 – Conditions: Grade Checker</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: sans-serif;
+        background-color: lightgreen;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 16px;
+    }
+
+    .card {
+        background-color: white;
+        border-radius: 12px;
+        padding: 32px;
+        width: 100%;
+        max-width: 340px;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    h2 {
+        color: #1a56db;
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 8px;
+    }
+
+    #score {
+        width: 100%;
+        padding: 10px 14px;
+        font-size: 16px;
+        border: 2px solid #c8d4f0;
+        border-radius: 8px;
+        text-align: center;
+    }
+
+    #score:focus {
+        border-color: #1a56db;
+        outline: none;
+    }
+
+    #check-btn {
+        width: 100%;
+        margin-top: 12px;
+        padding: 12px;
+        font-size: 16px;
+        font-weight: bold;
+        border: none;
+        border-radius: 8px;
+        background-color: #1a56db;
+        color: white;
+        cursor: pointer;
+    }
+
+    #result {
+        font-size: 3rem;
+        font-weight: bold;
+        margin-top: 20px;
+    }
+
+    #message {
+        color: #6b7280;
+        margin-top: 4px;
+    }
+
+    /* One colour per grade, chosen in JS with an if/else chain */
+    .grade-A { color: #16a34a; }
+    .grade-B { color: #1a56db; }
+    .grade-C { color: #d97706; }
+    .grade-F { color: #dc2626; }
+    .grade-error { color: #9ca3af; font-size: 1.2rem; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Grade Checker</h2>
+
+    <label for="score">Score (0–100)</label>
+    <input type="number" id="score" value="75" min="0" max="100">
+    <button id="check-btn">Check Grade</button>
+
+    <p id="result">–</p>
+    <p id="message">Enter a score and press Check Grade.</p>
+  </div>
+
+  <script>
+    const scoreInput = document.querySelector('#score');
+    const checkBtn = document.querySelector('#check-btn');
+    const resultEl = document.querySelector('#result');
+    const messageEl = document.querySelector('#message');
+
+    function checkGrade() {
+      const raw = scoreInput.value;
+      const score = Number(raw);
+      let grade;
+      let message;
+
+      // Guard first: empty input or a number outside 0–100
+      if (raw === '' || score < 0 || score > 100) {
+        resultEl.textContent = 'Invalid';
+        resultEl.className = 'grade-error';
+        messageEl.textContent = 'Please enter a number from 0 to 100.';
+        return;
+      }
+
+      // if / else if / else — checked top to bottom, first match wins
+      if (score >= 90) {
+        grade = 'A';
+        message = 'Excellent work!';
+      } else if (score >= 80) {
+        grade = 'B';
+        message = 'Great job!';
+      } else if (score >= 70) {
+        grade = 'C';
+        message = 'You passed.';
+      } else {
+        grade = 'F';
+        message = 'Keep practising — you can do it!';
+      }
+
+      console.log('Score:', score, '→ Grade:', grade);
+      resultEl.textContent = grade;
+      resultEl.className = 'grade-' + grade;
+      messageEl.textContent = message;
+    }
+
+    checkBtn.addEventListener('click', checkGrade);
+
+    // Pressing Enter in the input also checks the grade
+    scoreInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') checkGrade();
+    });
+  </script>
+</body>
+</html>

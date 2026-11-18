@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E3 – Loops</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: sans-serif;
+        background-color: lightgreen;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 60px 16px;
+    }
+
+    .card {
+        background-color: white;
+        border-radius: 12px;
+        padding: 32px;
+        width: 100%;
+        max-width: 400px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    h2 {
+        color: #1a56db;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    button {
+        flex: 1 1 auto;
+        padding: 10px 14px;
+        font-size: 14px;
+        font-weight: bold;
+        border: none;
+        border-radius: 8px;
+        color: white;
+        background-color: #1a56db;
+        cursor: pointer;
+    }
+
+    #clear-btn {
+        background-color: #6b7280;
+    }
+
+    #output {
+        list-style: none;
+        margin-top: 20px;
+    }
+
+    #output li {
+        padding: 10px 14px;
+        margin-bottom: 6px;
+        border-left: 4px solid #10B981;
+        background-color: #ecfdf5;
+        border-radius: 6px;
+    }
+
+    #empty {
+        margin-top: 20px;
+        color: #9ca3af;
+        text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Loops</h2>
+
+    <div class="buttons">
+      <button id="repeat-btn">Repeat 5 times</button>
+      <button id="fruits-btn">Loop through fruits</button>
+      <button id="clear-btn">Clear</button>
+    </div>
+
+    <ul id="output"></ul>
+    <p id="empty">Press a button to run a loop.</p>
+  </div>
+
+  <script>
+    const output = document.querySelector('#output');
+    const empty = document.querySelector('#empty');
+
+    // Adds one line to the list (and the console)
+    function addLine(text) {
+      console.log(text);
+      const li = document.createElement('li');
+      li.textContent = text;
+      output.appendChild(li);
+      empty.style.display = 'none';
+    }
+
+    // for loop — counts from 1 to 5
+    function repeatFive() {
+      for (let i = 1; i <= 5; i++) {
+        addLine('Step ' + i);
+      }
+    }
+
+    // for...of loop — visits every item in an array
+    function loopFruits() {
+      const fruits = ['apple', 'banana', 'cherry'];
+      for (const fruit of fruits) {
+        addLine(fruit);
+      }
+    }
+
+    function clearOutput() {
+      output.innerHTML = '';
+      empty.style.display = 'block';
+    }
+
+    document.querySelector('#repeat-btn').addEventListener('click', repeatFive);
+    document.querySelector('#fruits-btn').addEventListener('click', loopFruits);
+    document.querySelector('#clear-btn').addEventListener('click', clearOutput);
+  </script>
+</body>
+</html>
