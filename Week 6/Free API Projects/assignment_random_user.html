@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Random Profile Generator</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: sans-serif;
+        background-color: lightgreen;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 60px 16px;
+    }
+
+    .card {
+        background-color: white;
+        border-radius: 12px;
+        padding: 32px;
+        width: 100%;
+        max-width: 440px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 { color: #15803d; font-size: 1.6rem; margin-bottom: 4px; }
+    .subtitle { color: #6b7280; font-size: 0.9rem; margin-bottom: 20px; }
+
+    button {
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .controls {
+        display: flex;
+        gap: 10px;
+    }
+
+    .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+    }
+
+    #gender {
+        padding: 0 10px;
+        border: 2px solid #10B981;
+        border-radius: 8px;
+        background-color: white;
+        color: #15803d;
+        font-size: 15px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    #load-btn {
+        flex: 1;
+        background-color: #10B981;
+        color: white;
+        padding: 12px;
+        font-size: 16px;
+    }
+
+    #load-btn:disabled { opacity: 0.6; cursor: default; }
+
+    /* Loading spinner */
+    #loading {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        color: #15803d;
+        margin-top: 20px;
+    }
+
+    .spinner {
+        width: 22px;
+        height: 22px;
+        border: 3px solid #d1fae5;
+        border-top-color: #10B981;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #error {
+        display: none;
+        background-color: #fee2e2;
+        border-left: 5px solid #dc2626;
+        color: #7f1d1d;
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-top: 20px;
+    }
+
+    /* Profile */
+    #profile {
+        display: none;
+        margin-top: 20px;
+        text-align: center;
+        background-color: #ecfdf5;
+        border-radius: 12px;
+        padding: 24px 16px 16px;
+    }
+
+    #photo {
+        width: 112px;
+        height: 112px;
+        border-radius: 50%;
+        border: 4px solid white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+        object-fit: cover;
+    }
+
+    #name { font-size: 1.3rem; margin-top: 10px; }
+    #username { color: #6b7280; font-size: 0.85rem; }
+
+    .info {
+        list-style: none;
+        text-align: left;
+        margin-top: 16px;
+        background-color: white;
+        border-radius: 8px;
+        padding: 4px 14px;
+    }
+
+    .info li {
+        display: flex;
+        gap: 10px;
+        padding: 8px 0;
+        border-bottom: 1px solid #f3f4f6;
+        font-size: 0.9rem;
+        overflow-wrap: anywhere;
+    }
+
+    .info li:last-child { border-bottom: none; }
+
+    .info .label {
+        flex: 0 0 72px;
+        color: #6b7280;
+    }
+
+    #save-btn {
+        margin-top: 14px;
+        background-color: white;
+        color: #15803d;
+        border: 2px solid #10B981;
+        padding: 6px 14px;
+    }
+
+    #save-btn:disabled {
+        border-color: #d1d5db;
+        color: #9ca3af;
+        cursor: default;
+    }
+
+    /* Saved contacts */
+    hr { border: none; border-top: 1px solid #e5e7eb; margin: 24px 0 16px; }
+    h2 { font-size: 1.1rem; margin-bottom: 12px; }
+
+    #contacts { list-style: none; }
+
+    #contacts li {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px;
+        margin-bottom: 6px;
+        border: 1px solid #d1fae5;
+        border-radius: 8px;
+        font-size: 0.9rem;
+    }
+
+    #contacts img {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    #contacts .contact-text {
+        flex: 1;
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    #contacts .contact-email {
+        display: block;
+        font-size: 0.8rem;
+        color: #6b7280;
+    }
+
+    .remove-btn {
+        background-color: #dc2626;
+        color: white;
+        padding: 4px 10px;
+        font-size: 12px;
+        flex-shrink: 0;
+    }
+
+    #no-contacts { color: #9ca3af; text-align: center; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Random Profile Generator</h1>
+    <p class="subtitle">Week 6 Assignment · Random User API</p>
+
+    <div class="controls">
+      <label for="gender" class="visually-hidden">Gender</label>
+      <select id="gender">
+        <option value="">Any</option>
+        <option value="female">Female</option>
+        <option value="male">Male</option>
+      </select>
+      <button id="load-btn">Generate Profile</button>
+    </div>
+
+    <div id="loading">
+      <div class="spinner"></div>
+      <span>Loading…</span>
+    </div>
+
+    <p id="error"></p>
+
+    <section id="profile">
+      <img id="photo" alt="">
+      <h3 id="name"></h3>
+      <p id="username"></p>
+
+      <ul class="info">
+        <li><span class="label">Email</span><span id="email"></span></li>
+        <li><span class="label">Phone</span><span id="phone"></span></li>
+        <li><span class="label">Age</span><span id="age"></span></li>
+        <li><span class="label">Location</span><span id="location"></span></li>
+      </ul>
+
+      <button id="save-btn">⭐ Save Contact</button>
+    </section>
+
+    <hr>
+    <h2>Saved Contacts</h2>
+    <ul id="contacts"></ul>
+    <p id="no-contacts">No saved contacts yet.</p>
+  </div>
+
+  <script>
+    const API = 'https://randomuser.me/api/';
+    const STORAGE_KEY = 'savedContacts';
+
+    const genderSelect = document.querySelector('#gender');
+    const loadBtn = document.querySelector('#load-btn');
+    const loading = document.querySelector('#loading');
+    const errorEl = document.querySelector('#error');
+    const profileEl = document.querySelector('#profile');
+    const saveBtn = document.querySelector('#save-btn');
+    const contactsEl = document.querySelector('#contacts');
+    const noContacts = document.querySelector('#no-contacts');
+
+    let currentUser = null;
+
+    async function loadProfile() {
+      loadBtn.disabled = true;
+      genderSelect.disabled = true;
+      loading.style.display = 'flex';
+      profileEl.style.display = 'none';
+      errorEl.style.display = 'none';
+
+      try {
+        const params = new URLSearchParams({ results: 1 });
+        if (genderSelect.value) params.set('gender', genderSelect.value);
+
+        const res = await fetch(`${API}?${params}`);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+
+        // Random User wraps people in a "results" array
+        if (data.error) throw new Error(data.error);
+        const user = data.results[0];
+
+        currentUser = {
+          id: user.login.uuid,
+          name: user.name.first + ' ' + user.name.last,
+          email: user.email,
+          thumb: user.picture.thumbnail
+        };
+        renderProfile(user);
+
+      } catch (err) {
+        errorEl.textContent = '😕 Sorry, we couldn\'t generate a profile right now. Please try again. (' + err.message + ')';
+        errorEl.style.display = 'block';
+
+      } finally {
+        loading.style.display = 'none';
+        loadBtn.disabled = false;
+        genderSelect.disabled = false;
+      }
+    }
+
+    function renderProfile(user) {
+      const photo = document.querySelector('#photo');
+      photo.src = user.picture.large;
+      photo.alt = 'Photo of ' + currentUser.name;
+
+      document.querySelector('#name').textContent = currentUser.name;
+      document.querySelector('#username').textContent = '@' + user.login.username;
+      document.querySelector('#email').textContent = user.email;
+      document.querySelector('#phone').textContent = user.phone;
+      document.querySelector('#age').textContent = user.dob.age;
+      document.querySelector('#location').textContent =
+        user.location.city + ', ' + user.location.state + ', ' + user.location.country;
+
+      updateSaveButton();
+      profileEl.style.display = 'block';
+    }
+
+    // ── Saved contacts (localStorage) ──
+    function getContacts() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function setContacts(list) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+      } catch (e) {
+        // storage blocked — contacts just won't persist
+      }
+    }
+
+    function updateSaveButton() {
+      const saved = currentUser && getContacts().some(c => c.id === currentUser.id);
+      saveBtn.disabled = saved;
+      saveBtn.textContent = saved ? '✓ Saved' : '⭐ Save Contact';
+    }
+
+    function saveContact() {
+      if (!currentUser) return;
+      const list = getContacts();
+      if (list.some(c => c.id === currentUser.id)) return;
+      list.push(currentUser);
+      setContacts(list);
+      renderContacts();
+      updateSaveButton();
+    }
+
+    function renderContacts() {
+      const list = getContacts();
+      contactsEl.innerHTML = '';
+
+      list.forEach(c => {
+        const li = document.createElement('li');
+
+        const img = document.createElement('img');
+        img.src = c.thumb;
+        img.alt = '';
+
+        const text = document.createElement('div');
+        text.className = 'contact-text';
+        const name = document.createElement('strong');
+        name.textContent = c.name;
+        const email = document.createElement('span');
+        email.className = 'contact-email';
+        email.textContent = c.email;
+        text.append(name, email);
+
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'remove-btn';
+        removeBtn.textContent = '✕';
+        removeBtn.dataset.id = c.id;
+        removeBtn.setAttribute('aria-label', 'Remove ' + c.name);
+
+        li.append(img, text, removeBtn);
+        contactsEl.appendChild(li);
+      });
+
+      noContacts.style.display = list.length === 0 ? 'block' : 'none';
+    }
+
+    contactsEl.addEventListener('click', (e) => {
+      if (e.target.matches('.remove-btn')) {
+        setContacts(getContacts().filter(c => c.id !== e.target.dataset.id));
+        renderContacts();
+        updateSaveButton();
+      }
+    });
+
+    loadBtn.addEventListener('click', loadProfile);
+    saveBtn.addEventListener('click', saveContact);
+
+    renderContacts();
+    loadProfile();
+  </script>
+</body>
+</html>

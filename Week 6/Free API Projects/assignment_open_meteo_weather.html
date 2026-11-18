@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather Now</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: sans-serif;
+        background-color: lightgreen;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 60px 16px;
+    }
+
+    .card {
+        background-color: white;
+        border-radius: 12px;
+        padding: 32px;
+        width: 100%;
+        max-width: 480px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 { color: #15803d; font-size: 1.6rem; margin-bottom: 4px; }
+    .subtitle { color: #6b7280; font-size: 0.9rem; margin-bottom: 20px; }
+
+    button {
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .search {
+        display: flex;
+        gap: 8px;
+    }
+
+    .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+    }
+
+    #city {
+        flex: 1;
+        min-width: 0;
+        padding: 10px 14px;
+        font-size: 16px;
+        border: 2px solid #c8d4f0;
+        border-radius: 8px;
+    }
+
+    #city:focus { border-color: #10B981; outline: none; }
+
+    #search-btn {
+        background-color: #10B981;
+        color: white;
+        padding: 0 18px;
+        font-size: 15px;
+    }
+
+    #search-btn:disabled { opacity: 0.6; cursor: default; }
+
+    /* Saved cities as quick buttons */
+    #saved-cities {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 12px;
+    }
+
+    .chip {
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid #10B981;
+        border-radius: 999px;
+        overflow: hidden;
+    }
+
+    .chip button {
+        background: white;
+        color: #15803d;
+        font-size: 13px;
+        padding: 4px 10px;
+        border-radius: 0;
+    }
+
+    .chip .chip-remove {
+        color: #9ca3af;
+        padding: 4px 8px 4px 2px;
+    }
+
+    /* Loading spinner */
+    #loading {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        color: #15803d;
+        margin-top: 20px;
+    }
+
+    .spinner {
+        width: 22px;
+        height: 22px;
+        border: 3px solid #d1fae5;
+        border-top-color: #10B981;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #error {
+        display: none;
+        background-color: #fee2e2;
+        border-left: 5px solid #dc2626;
+        color: #7f1d1d;
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-top: 20px;
+    }
+
+    /* Weather */
+    #weather {
+        display: none;
+        margin-top: 20px;
+    }
+
+    .now {
+        background-color: #ecfdf5;
+        border-left: 5px solid #10B981;
+        border-radius: 8px;
+        padding: 16px;
+    }
+
+    .place-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    #place { font-weight: bold; font-size: 1.1rem; }
+    #place-detail { font-size: 0.8rem; color: #6b7280; }
+
+    #save-btn {
+        background-color: white;
+        color: #15803d;
+        border: 2px solid #10B981;
+        padding: 4px 10px;
+        font-size: 13px;
+        flex-shrink: 0;
+    }
+
+    #save-btn:disabled {
+        border-color: #d1d5db;
+        color: #9ca3af;
+        cursor: default;
+    }
+
+    .temp-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-top: 12px;
+    }
+
+    #icon { font-size: 3rem; line-height: 1; }
+    #temp { font-size: 2.6rem; font-weight: bold; color: #15803d; }
+    #condition { color: #374151; }
+
+    .details {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        margin-top: 14px;
+        text-align: center;
+    }
+
+    .details div {
+        background-color: white;
+        border-radius: 8px;
+        padding: 8px 4px;
+    }
+
+    .details span {
+        display: block;
+        font-size: 0.75rem;
+        color: #6b7280;
+    }
+
+    .details strong { font-size: 1rem; }
+
+    h2 { font-size: 1rem; margin: 18px 0 10px; }
+
+    #forecast {
+        list-style: none;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    #forecast li {
+        border: 1px solid #d1fae5;
+        border-radius: 8px;
+        padding: 10px 6px;
+        text-align: center;
+        font-size: 0.85rem;
+    }
+
+    .f-day { font-weight: bold; }
+    .f-icon { font-size: 1.6rem; margin: 4px 0; }
+    .f-temps { color: #6b7280; }
+    .f-temps strong { color: #111827; }
+
+    #updated {
+        margin-top: 12px;
+        font-size: 0.75rem;
+        color: #9ca3af;
+        text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Weather Now</h1>
+    <p class="subtitle">Week 6 Assignment · Open-Meteo API</p>
+
+    <form class="search" id="search-form">
+      <label for="city" class="visually-hidden">City name</label>
+      <input id="city" type="text" placeholder="Search a city…" value="Seoul" autocomplete="off">
+      <button id="search-btn" type="submit">Search</button>
+    </form>
+
+    <div id="saved-cities"></div>
+
+    <div id="loading">
+      <div class="spinner"></div>
+      <span>Loading…</span>
+    </div>
+
+    <p id="error"></p>
+
+    <section id="weather">
+      <div class="now">
+        <div class="place-row">
+          <div>
+            <div id="place"></div>
+            <div id="place-detail"></div>
+          </div>
+          <button id="save-btn">⭐ Save City</button>
+        </div>
+
+        <div class="temp-row">
+          <div id="icon"></div>
+          <div>
+            <div id="temp"></div>
+            <div id="condition"></div>
+          </div>
+        </div>
+
+        <div class="details">
+          <div><span>Feels like</span><strong id="feels"></strong></div>
+          <div><span>Humidity</span><strong id="humidity"></strong></div>
+          <div><span>Wind</span><strong id="wind"></strong></div>
+        </div>
+      </div>
+
+      <h2>3-Day Forecast</h2>
+      <ul id="forecast"></ul>
+      <p id="updated"></p>
+    </section>
+  </div>
+
+  <script>
+    const GEO_API = 'https://geocoding-api.open-meteo.com/v1/search';
+    const WEATHER_API = 'https://api.open-meteo.com/v1/forecast';
+    const STORAGE_KEY = 'savedCities';
+
+    const form = document.querySelector('#search-form');
+    const cityInput = document.querySelector('#city');
+    const searchBtn = document.querySelector('#search-btn');
+    const savedEl = document.querySelector('#saved-cities');
+    const loading = document.querySelector('#loading');
+    const errorEl = document.querySelector('#error');
+    const weatherEl = document.querySelector('#weather');
+    const saveBtn = document.querySelector('#save-btn');
+
+    let currentPlace = null;
+
+    // WMO weather codes → [emoji, description]
+    function describeWeather(code) {
+      if (code === 0) return ['☀️', 'Clear sky'];
+      if (code <= 2) return ['🌤️', 'Partly cloudy'];
+      if (code === 3) return ['☁️', 'Overcast'];
+      if (code === 45 || code === 48) return ['🌫️', 'Fog'];
+      if (code >= 51 && code <= 57) return ['🌦️', 'Drizzle'];
+      if (code >= 61 && code <= 67) return ['🌧️', 'Rain'];
+      if (code >= 71 && code <= 77) return ['🌨️', 'Snow'];
+      if (code >= 80 && code <= 82) return ['🌧️', 'Rain showers'];
+      if (code === 85 || code === 86) return ['🌨️', 'Snow showers'];
+      if (code >= 95) return ['⛈️', 'Thunderstorm'];
+      return ['🌡️', 'Unknown'];
+    }
+
+    async function getJSON(url) {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return await res.json();
+    }
+
+    async function loadWeather(cityName) {
+      searchBtn.disabled = true;
+      loading.style.display = 'flex';
+      weatherEl.style.display = 'none';
+      errorEl.style.display = 'none';
+
+      try {
+        // Step 1: turn the city name into latitude/longitude
+        const geo = await getJSON(`${GEO_API}?name=${encodeURIComponent(cityName)}&count=1`);
+        if (!geo.results || geo.results.length === 0) {
+          throw new Error(`No city called "${cityName}" was found`);
+        }
+        const place = geo.results[0];
+
+        // Step 2: fetch the weather for those coordinates
+        const params = new URLSearchParams({
+          latitude: place.latitude,
+          longitude: place.longitude,
+          current: 'temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m',
+          daily: 'weather_code,temperature_2m_max,temperature_2m_min',
+          timezone: 'auto',
+          forecast_days: 3
+        });
+        const weather = await getJSON(`${WEATHER_API}?${params}`);
+
+        currentPlace = { name: place.name, country: place.country || '' };
+        renderWeather(place, weather);
+
+      } catch (err) {
+        errorEl.textContent = '😕 Sorry, we couldn\'t load the weather. ' + err.message + '.';
+        errorEl.style.display = 'block';
+
+      } finally {
+        loading.style.display = 'none';
+        searchBtn.disabled = false;
+      }
+    }
+
+    function renderWeather(place, weather) {
+      const now = weather.current;
+      const [icon, text] = describeWeather(now.weather_code);
+
+      document.querySelector('#place').textContent = place.name;
+      document.querySelector('#place-detail').textContent =
+        [place.admin1, place.country].filter(Boolean).join(', ');
+      document.querySelector('#icon').textContent = icon;
+      document.querySelector('#temp').textContent = Math.round(now.temperature_2m) + '°C';
+      document.querySelector('#condition').textContent = text;
+      document.querySelector('#feels').textContent = Math.round(now.apparent_temperature) + '°C';
+      document.querySelector('#humidity').textContent = now.relative_humidity_2m + '%';
+      document.querySelector('#wind').textContent = Math.round(now.wind_speed_10m) + ' km/h';
+
+      const forecast = document.querySelector('#forecast');
+      forecast.innerHTML = '';
+      weather.daily.time.forEach((date, i) => {
+        const [dIcon, dText] = describeWeather(weather.daily.weather_code[i]);
+        // Parse as local noon so the weekday doesn't shift across timezones
+        const dayName = i === 0 ? 'Today'
+          : new Date(date + 'T12:00').toLocaleDateString('en-US', { weekday: 'short' });
+
+        const li = document.createElement('li');
+        const day = document.createElement('div');
+        day.className = 'f-day';
+        day.textContent = dayName;
+        const iconEl = document.createElement('div');
+        iconEl.className = 'f-icon';
+        iconEl.textContent = dIcon;
+        iconEl.title = dText;
+        const temps = document.createElement('div');
+        temps.className = 'f-temps';
+        const max = document.createElement('strong');
+        max.textContent = Math.round(weather.daily.temperature_2m_max[i]) + '°';
+        temps.append(max, ' / ' + Math.round(weather.daily.temperature_2m_min[i]) + '°');
+        li.append(day, iconEl, temps);
+        forecast.appendChild(li);
+      });
+
+      document.querySelector('#updated').textContent =
+        'Local time at last update: ' + now.time.replace('T', ' ') + ' (' + weather.timezone + ')';
+
+      updateSaveButton();
+      weatherEl.style.display = 'block';
+    }
+
+    // ── Saved cities (localStorage) ──
+    function getSaved() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function setSaved(list) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+      } catch (e) {
+        // storage blocked — saved cities just won't persist
+      }
+    }
+
+    function updateSaveButton() {
+      const saved = currentPlace && getSaved().some(c => c.name === currentPlace.name);
+      saveBtn.disabled = saved;
+      saveBtn.textContent = saved ? '✓ Saved' : '⭐ Save City';
+    }
+
+    function saveCity() {
+      if (!currentPlace) return;
+      const list = getSaved();
+      if (list.some(c => c.name === currentPlace.name)) return;
+      list.push(currentPlace);
+      setSaved(list);
+      renderSaved();
+      updateSaveButton();
+    }
+
+    function renderSaved() {
+      savedEl.innerHTML = '';
+      getSaved().forEach(city => {
+        const chip = document.createElement('span');
+        chip.className = 'chip';
+
+        const go = document.createElement('button');
+        go.type = 'button';
+        go.className = 'chip-go';
+        go.textContent = city.name;
+        go.dataset.name = city.name;
+
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.className = 'chip-remove';
+        remove.textContent = '✕';
+        remove.dataset.name = city.name;
+        remove.setAttribute('aria-label', 'Remove ' + city.name);
+
+        chip.append(go, remove);
+        savedEl.appendChild(chip);
+      });
+    }
+
+    savedEl.addEventListener('click', (e) => {
+      const name = e.target.dataset.name;
+      if (!name) return;
+      if (e.target.matches('.chip-go')) {
+        cityInput.value = name;
+        loadWeather(name);
+      } else if (e.target.matches('.chip-remove')) {
+        setSaved(getSaved().filter(c => c.name !== name));
+        renderSaved();
+        updateSaveButton();
+      }
+    });
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = cityInput.value.trim();
+      if (name) loadWeather(name);
+    });
+
+    saveBtn.addEventListener('click', saveCity);
+
+    renderSaved();
+    loadWeather(cityInput.value);
+  </script>
+</body>
+</html>

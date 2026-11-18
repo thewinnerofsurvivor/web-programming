@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini Pokédex</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: sans-serif;
+        background-color: lightgreen;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 60px 16px;
+    }
+
+    .card {
+        background-color: white;
+        border-radius: 12px;
+        padding: 32px;
+        width: 100%;
+        max-width: 460px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 { color: #15803d; font-size: 1.6rem; margin-bottom: 4px; }
+    .subtitle { color: #6b7280; font-size: 0.9rem; margin-bottom: 20px; }
+
+    button {
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    button:disabled { opacity: 0.6; cursor: default; }
+
+    .search {
+        display: flex;
+        gap: 8px;
+    }
+
+    .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+    }
+
+    #query {
+        flex: 1;
+        min-width: 0;
+        padding: 10px 14px;
+        font-size: 16px;
+        border: 2px solid #c8d4f0;
+        border-radius: 8px;
+    }
+
+    #query:focus { border-color: #10B981; outline: none; }
+
+    #search-btn {
+        background-color: #10B981;
+        color: white;
+        padding: 0 16px;
+        font-size: 15px;
+    }
+
+    #random-btn {
+        background-color: white;
+        color: #15803d;
+        border: 2px solid #10B981;
+        padding: 0 12px;
+        font-size: 15px;
+    }
+
+    /* Loading spinner */
+    #loading {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        color: #15803d;
+        margin-top: 20px;
+    }
+
+    .spinner {
+        width: 22px;
+        height: 22px;
+        border: 3px solid #d1fae5;
+        border-top-color: #10B981;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #error {
+        display: none;
+        background-color: #fee2e2;
+        border-left: 5px solid #dc2626;
+        color: #7f1d1d;
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-top: 20px;
+    }
+
+    /* Pokémon card */
+    #pokemon {
+        display: none;
+        margin-top: 20px;
+        background-color: #ecfdf5;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+    }
+
+    #artwork {
+        width: 180px;
+        height: 180px;
+        object-fit: contain;
+    }
+
+    #number { color: #6b7280; font-size: 0.85rem; font-weight: bold; }
+    #poke-name { font-size: 1.5rem; text-transform: capitalize; margin: 2px 0 8px; }
+
+    #types {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    .type {
+        font-size: 0.75rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: white;
+        border-radius: 999px;
+        padding: 3px 10px;
+        background-color: #6b7280;
+    }
+
+    /* A few type colours; anything else stays grey */
+    .type-fire { background-color: #ea580c; }
+    .type-water { background-color: #2563eb; }
+    .type-grass { background-color: #16a34a; }
+    .type-electric { background-color: #ca8a04; }
+    .type-psychic { background-color: #db2777; }
+    .type-ice { background-color: #0891b2; }
+    .type-dragon { background-color: #4f46e5; }
+    .type-dark { background-color: #374151; }
+    .type-fairy { background-color: #e879f9; }
+    .type-poison { background-color: #9333ea; }
+    .type-ground { background-color: #a16207; }
+    .type-rock { background-color: #78716c; }
+    .type-bug { background-color: #65a30d; }
+    .type-ghost { background-color: #6d28d9; }
+    .type-fighting { background-color: #b91c1c; }
+    .type-flying { background-color: #0ea5e9; }
+    .type-steel { background-color: #64748b; }
+
+    .size {
+        display: flex;
+        justify-content: center;
+        gap: 24px;
+        margin-top: 12px;
+        font-size: 0.9rem;
+        color: #374151;
+    }
+
+    #stats {
+        list-style: none;
+        margin-top: 16px;
+        text-align: left;
+    }
+
+    #stats li {
+        display: grid;
+        grid-template-columns: 70px 34px 1fr;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.8rem;
+        margin-bottom: 6px;
+    }
+
+    .stat-name { color: #6b7280; text-transform: uppercase; }
+    .stat-value { font-weight: bold; text-align: right; }
+
+    .bar {
+        height: 8px;
+        background-color: white;
+        border-radius: 999px;
+        overflow: hidden;
+    }
+
+    .bar-fill {
+        height: 100%;
+        background-color: #10B981;
+        border-radius: 999px;
+    }
+
+    #team-btn {
+        margin-top: 14px;
+        background-color: white;
+        color: #15803d;
+        border: 2px solid #10B981;
+        padding: 6px 14px;
+    }
+
+    #team-btn:disabled {
+        border-color: #d1d5db;
+        color: #9ca3af;
+    }
+
+    /* Team */
+    hr { border: none; border-top: 1px solid #e5e7eb; margin: 24px 0 16px; }
+    h2 { font-size: 1.1rem; margin-bottom: 12px; }
+
+    #team {
+        list-style: none;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    #team li {
+        position: relative;
+        border: 1px solid #d1fae5;
+        border-radius: 8px;
+        padding: 6px;
+        text-align: center;
+        font-size: 0.8rem;
+        text-transform: capitalize;
+    }
+
+    #team img {
+        width: 64px;
+        height: 64px;
+        display: block;
+        margin: 0 auto;
+    }
+
+    .team-pick {
+        background: none;
+        padding: 0;
+        width: 100%;
+        font-weight: normal;
+        color: inherit;
+    }
+
+    .remove-btn {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        background-color: #dc2626;
+        color: white;
+        padding: 1px 6px;
+        font-size: 11px;
+    }
+
+    #no-team { color: #9ca3af; text-align: center; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Mini Pokédex</h1>
+    <p class="subtitle">Week 6 Assignment · PokéAPI</p>
+
+    <form class="search" id="search-form">
+      <label for="query" class="visually-hidden">Pokémon name or number</label>
+      <input id="query" type="text" placeholder="Name or number, e.g. pikachu" value="pikachu" autocomplete="off">
+      <button id="search-btn" type="submit">Search</button>
+      <button id="random-btn" type="button" aria-label="Random Pokémon">🎲</button>
+    </form>
+
+    <div id="loading">
+      <div class="spinner"></div>
+      <span>Loading…</span>
+    </div>
+
+    <p id="error"></p>
+
+    <section id="pokemon">
+      <img id="artwork" alt="">
+      <div id="number"></div>
+      <h3 id="poke-name"></h3>
+      <div id="types"></div>
+      <div class="size">
+        <span>Height: <strong id="height"></strong></span>
+        <span>Weight: <strong id="weight"></strong></span>
+      </div>
+      <ul id="stats"></ul>
+      <button id="team-btn">➕ Add to Team</button>
+    </section>
+
+    <hr>
+    <h2>My Team (<span id="team-count">0</span>/6)</h2>
+    <ul id="team"></ul>
+    <p id="no-team">Your team is empty.</p>
+  </div>
+
+  <script>
+    const API = 'https://pokeapi.co/api/v2/pokemon/';
+    const STORAGE_KEY = 'pokemonTeam';
+    const TEAM_MAX = 6;
+    const MAX_ID = 1025; // number of Pokémon in the main series
+
+    const form = document.querySelector('#search-form');
+    const queryInput = document.querySelector('#query');
+    const searchBtn = document.querySelector('#search-btn');
+    const randomBtn = document.querySelector('#random-btn');
+    const loading = document.querySelector('#loading');
+    const errorEl = document.querySelector('#error');
+    const pokemonEl = document.querySelector('#pokemon');
+    const teamBtn = document.querySelector('#team-btn');
+    const teamEl = document.querySelector('#team');
+    const noTeam = document.querySelector('#no-team');
+
+    let currentPokemon = null;
+
+    async function loadPokemon(query) {
+      searchBtn.disabled = true;
+      randomBtn.disabled = true;
+      loading.style.display = 'flex';
+      pokemonEl.style.display = 'none';
+      errorEl.style.display = 'none';
+
+      try {
+        // PokéAPI needs lowercase names; numbers work as-is
+        const key = String(query).trim().toLowerCase();
+        const res = await fetch(API + encodeURIComponent(key));
+
+        // A bad name gives 404 — fetch() still RESOLVES, so check res.ok
+        if (res.status === 404) throw new Error(`No Pokémon called "${query}"`);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+
+        const data = await res.json();
+        currentPokemon = {
+          id: data.id,
+          name: data.name,
+          sprite: data.sprites.front_default
+        };
+        renderPokemon(data);
+
+      } catch (err) {
+        errorEl.textContent = '😕 ' + err.message + '. Check the spelling and try again.';
+        errorEl.style.display = 'block';
+
+      } finally {
+        loading.style.display = 'none';
+        searchBtn.disabled = false;
+        randomBtn.disabled = false;
+      }
+    }
+
+    function renderPokemon(data) {
+      const art = data.sprites.other['official-artwork'].front_default || data.sprites.front_default;
+      const artwork = document.querySelector('#artwork');
+      artwork.src = art;
+      artwork.alt = 'Artwork of ' + data.name;
+
+      document.querySelector('#number').textContent = '#' + String(data.id).padStart(4, '0');
+      document.querySelector('#poke-name').textContent = data.name;
+      // PokéAPI uses decimetres and hectograms
+      document.querySelector('#height').textContent = (data.height / 10) + ' m';
+      document.querySelector('#weight').textContent = (data.weight / 10) + ' kg';
+
+      const types = document.querySelector('#types');
+      types.innerHTML = '';
+      data.types.forEach(t => {
+        const span = document.createElement('span');
+        span.className = 'type type-' + t.type.name;
+        span.textContent = t.type.name;
+        types.appendChild(span);
+      });
+
+      const labels = {
+        'hp': 'HP', 'attack': 'Atk', 'defense': 'Def',
+        'special-attack': 'Sp. Atk', 'special-defense': 'Sp. Def', 'speed': 'Speed'
+      };
+      const stats = document.querySelector('#stats');
+      stats.innerHTML = '';
+      data.stats.forEach(s => {
+        const li = document.createElement('li');
+        const name = document.createElement('span');
+        name.className = 'stat-name';
+        name.textContent = labels[s.stat.name] || s.stat.name;
+        const value = document.createElement('span');
+        value.className = 'stat-value';
+        value.textContent = s.base_stat;
+        const bar = document.createElement('div');
+        bar.className = 'bar';
+        const fill = document.createElement('div');
+        fill.className = 'bar-fill';
+        // 255 is the highest possible base stat
+        fill.style.width = Math.min(100, (s.base_stat / 255) * 100) + '%';
+        bar.appendChild(fill);
+        li.append(name, value, bar);
+        stats.appendChild(li);
+      });
+
+      updateTeamButton();
+      pokemonEl.style.display = 'block';
+    }
+
+    // ── Team (localStorage, max 6) ──
+    function getTeam() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function setTeam(team) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(team));
+      } catch (e) {
+        // storage blocked — team just won't persist
+      }
+    }
+
+    function updateTeamButton() {
+      const team = getTeam();
+      if (currentPokemon && team.some(p => p.id === currentPokemon.id)) {
+        teamBtn.disabled = true;
+        teamBtn.textContent = '✓ On your team';
+      } else if (team.length >= TEAM_MAX) {
+        teamBtn.disabled = true;
+        teamBtn.textContent = 'Team is full (6/6)';
+      } else {
+        teamBtn.disabled = false;
+        teamBtn.textContent = '➕ Add to Team';
+      }
+    }
+
+    function addToTeam() {
+      if (!currentPokemon) return;
+      const team = getTeam();
+      if (team.length >= TEAM_MAX || team.some(p => p.id === currentPokemon.id)) return;
+      team.push(currentPokemon);
+      setTeam(team);
+      renderTeam();
+      updateTeamButton();
+    }
+
+    function renderTeam() {
+      const team = getTeam();
+      teamEl.innerHTML = '';
+
+      team.forEach(p => {
+        const li = document.createElement('li');
+
+        // Clicking a team member loads it again
+        const pick = document.createElement('button');
+        pick.className = 'team-pick';
+        pick.dataset.name = p.name;
+        const img = document.createElement('img');
+        img.src = p.sprite;
+        img.alt = '';
+        const name = document.createElement('span');
+        name.textContent = p.name;
+        pick.append(img, name);
+
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'remove-btn';
+        removeBtn.textContent = '✕';
+        removeBtn.dataset.id = p.id;
+        removeBtn.setAttribute('aria-label', 'Remove ' + p.name);
+
+        li.append(pick, removeBtn);
+        teamEl.appendChild(li);
+      });
+
+      document.querySelector('#team-count').textContent = team.length;
+      noTeam.style.display = team.length === 0 ? 'block' : 'none';
+    }
+
+    teamEl.addEventListener('click', (e) => {
+      if (e.target.matches('.remove-btn')) {
+        const id = Number(e.target.dataset.id);
+        setTeam(getTeam().filter(p => p.id !== id));
+        renderTeam();
+        updateTeamButton();
+        return;
+      }
+      const pick = e.target.closest('.team-pick');
+      if (pick) {
+        queryInput.value = pick.dataset.name;
+        loadPokemon(pick.dataset.name);
+      }
+    });
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (queryInput.value.trim()) loadPokemon(queryInput.value);
+    });
+
+    randomBtn.addEventListener('click', () => {
+      const id = Math.floor(Math.random() * MAX_ID) + 1;
+      queryInput.value = id;
+      loadPokemon(id);
+    });
+
+    teamBtn.addEventListener('click', addToTeam);
+
+    renderTeam();
+    loadPokemon(queryInput.value);
+  </script>
+</body>
+</html>
