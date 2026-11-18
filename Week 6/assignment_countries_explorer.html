@@ -221,7 +221,7 @@
 <body>
   <div class="card">
     <h1>Country Explorer</h1>
-    <p class="subtitle">Week 6 Assignment · Countries API</p>
+    <p class="subtitle">Week 6 Assignment · REST Countries API</p>
 
     <form class="search" id="search-form">
       <label for="mode" class="visually-hidden">Search by</label>
@@ -264,13 +264,21 @@
     <p id="no-favourites">No favourites yet. Tap ☆ in the table to add one.</p>
 
     <p class="note">
-      The slides use restcountries.com v3.1, but that version has been retired and its replacement needs an API key.
-      This page uses countries.dev, a free mirror of the same data that needs no key.
+      Data from REST Countries v5 (restcountries.com). The v3.1 address in the slides has been retired,
+      so this page uses v5, which needs a free API key limited to this site's domain.
     </p>
   </div>
 
   <script>
-    const API = 'https://countries.dev';
+    // REST Countries v5 — needs a free API key from https://restcountries.com/sign-up
+    // In the dashboard, add this site's hostname (e.g. yourname.github.io) to the key's
+    // allowed origins, otherwise the browser request is refused with 403.
+    const API_KEY = 'PASTE_YOUR_API_KEY_HERE';
+    const API = 'https://api.restcountries.com/countries/v5';
+    const FIELDS = [
+      'names.common', 'codes.alpha_3', 'capitals', 'population', 'area.kilometers',
+      'region', 'subregion', 'languages', 'currencies', 'flag.url_png', 'flag.emoji'
+    ].join(',');
     const STORAGE_KEY = 'favouriteCountries';
 
     const form = document.querySelector('#search-form');
@@ -307,17 +315,31 @@
       summaryEl.textContent = '';
 
       try {
-        const url = `${API}/${modeSelect.value}/${encodeURIComponent(query)}`;
-        const res = await fetch(url);
+        if (!API_KEY || API_KEY === 'PASTE_YOUR_API_KEY_HERE') {
+          throw new Error('No API key set. Add your REST Countries key to API_KEY in this page\'s script');
+        }
 
-        // "Not found" comes back as HTTP 404 — fetch() still RESOLVES, so check it
-        if (res.status === 404) throw new Error(`No countries match "${query}"`);
-        if (!res.ok) throw new Error('HTTP ' + res.status);
+        // /name?q= and /region?q= both do a case-insensitive substring search
+        const params = new URLSearchParams({ q: query, response_fields: FIELDS, limit: 100 });
+        const res = await fetch(`${API}/${modeSelect.value}?${params}`, {
+          headers: { Authorization: 'Bearer ' + API_KEY }
+        });
 
-        const data = await res.json();
-        if (!Array.isArray(data) || data.length === 0) throw new Error(`No countries match "${query}"`);
+        // HTTP errors still RESOLVE the Promise — check res.ok and give a clear message
+        if (!res.ok) {
+          if (res.status === 404) throw new Error(`No countries match "${query}"`);
+          if (res.status === 401) throw new Error('The API key was not accepted');
+          if (res.status === 403) throw new Error('Access refused (is this site added to the key\'s allowed origins?)');
+          if (res.status === 429) throw new Error('Too many requests. Wait a few seconds');
+          throw new Error('HTTP ' + res.status);
+        }
 
-        countries = data;
+        const body = await res.json();
+        // v5 wraps results: { data: { objects: [...], meta: {...} } }
+        const objects = (body.data && body.data.objects) || [];
+        if (objects.length === 0) throw new Error(`No countries match "${query}"`);
+
+        countries = objects.map(toCountry);
         renderTable();
 
       } catch (err) {
@@ -328,6 +350,25 @@
         loading.style.display = 'none';
         searchBtn.disabled = false;
       }
+    }
+
+    // Turn one v5 object into the simple shape the table uses
+    function toCountry(o) {
+      const capitals = o.capitals || [];
+      const primary = capitals.find(c => c.attributes && c.attributes.primary) || capitals[0];
+      return {
+        name: (o.names && o.names.common) || 'Unknown',
+        alpha3Code: (o.codes && o.codes.alpha_3) || '',
+        capital: primary ? primary.name : '',
+        population: o.population,
+        area: o.area ? o.area.kilometers : undefined,
+        region: o.region,
+        subregion: o.subregion,
+        flag: o.flag ? o.flag.emoji : '',
+        flags: { png: o.flag ? o.flag.url_png : '' },
+        languages: o.languages || [],
+        currencies: Array.isArray(o.currencies) ? o.currencies : Object.values(o.currencies || {})
+      };
     }
 
     function formatNumber(n) {
