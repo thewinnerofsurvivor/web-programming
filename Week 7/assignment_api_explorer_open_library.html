@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Explorer — Open Library</title>
+  <style>
+    /* ── Step 2: CSS Layout & Cards ── */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: sans-serif;
+        background-color: #fdf6ec;
+        color: #222;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 60px 16px;
+    }
+
+    .container {
+        background-color: white;
+        border-radius: 12px;
+        padding: 32px;
+        width: 100%;
+        max-width: 960px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 { color: #92400e; font-size: 1.6rem; margin-bottom: 4px; }
+    .subtitle { color: #6b7280; font-size: 0.9rem; margin-bottom: 20px; }
+
+    button {
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+    }
+
+    /* Search form */
+    .search {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    #query {
+        flex: 1 1 220px;
+        min-width: 0;
+        padding: 10px 14px;
+        font-size: 16px;
+        border: 2px solid #f1dcc0;
+        border-radius: 8px;
+    }
+
+    #query:focus { border-color: #d97706; outline: none; }
+
+    #field {
+        padding: 0 10px;
+        border: 2px solid #d97706;
+        border-radius: 8px;
+        background-color: white;
+        color: #92400e;
+        font-size: 15px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    #search-btn {
+        background-color: #d97706;
+        color: white;
+        padding: 10px 18px;
+        font-size: 15px;
+    }
+
+    #search-btn:disabled { opacity: 0.6; cursor: default; }
+
+    /* Loading spinner (Step 6) */
+    #loading {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        color: #92400e;
+        margin-top: 24px;
+    }
+
+    .spinner {
+        width: 22px;
+        height: 22px;
+        border: 3px solid #fde68a;
+        border-top-color: #d97706;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Error box (Step 6) */
+    #error {
+        display: none;
+        background-color: #fee2e2;
+        border-left: 5px solid #dc2626;
+        color: #7f1d1d;
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-top: 20px;
+    }
+
+    #summary {
+        margin-top: 16px;
+        font-size: 0.85rem;
+        color: #6b7280;
+    }
+
+    /* Card grid: as many 180px columns as fit */
+    #results {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 16px;
+        margin-top: 12px;
+    }
+
+    .book-card {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #f1dcc0;
+        border-radius: 10px;
+        overflow: hidden;
+        background-color: #fffdf9;
+        transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .book-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 14px rgba(146, 64, 14, 0.15);
+    }
+
+    .cover {
+        aspect-ratio: 2 / 3;
+        background-color: #fef3c7;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .no-cover {
+        color: #b45309;
+        font-size: 0.8rem;
+        text-align: center;
+        padding: 12px;
+    }
+
+    .book-info {
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        flex: 1;
+    }
+
+    .book-title {
+        font-size: 0.95rem;
+        color: #222;
+        line-height: 1.3;
+    }
+
+    .book-author { font-size: 0.85rem; color: #6b7280; }
+
+    .book-meta {
+        font-size: 0.75rem;
+        color: #9ca3af;
+        margin-top: auto;
+        padding-top: 6px;
+    }
+
+    .book-link {
+        font-size: 0.8rem;
+        font-weight: bold;
+        color: #d97706;
+        text-decoration: none;
+    }
+
+    .book-link:hover { text-decoration: underline; }
+
+    #more-btn {
+        display: none;
+        margin: 20px auto 0;
+        background-color: white;
+        color: #92400e;
+        border: 2px solid #d97706;
+        padding: 8px 18px;
+        font-size: 14px;
+    }
+
+    #more-btn:disabled { opacity: 0.6; cursor: default; }
+
+    .note {
+        margin-top: 24px;
+        font-size: 0.75rem;
+        color: #9ca3af;
+    }
+
+    @media (max-width: 480px) {
+        .container { padding: 20px; }
+        #results { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- ── Step 1: HTML Structure ── -->
+  <main class="container">
+    <h1>📚 API Explorer — Open Library</h1>
+    <p class="subtitle">Week 7 Assignment · Open Library Search API</p>
+
+    <form class="search" id="search-form">
+      <label for="field" class="visually-hidden">Search by</label>
+      <select id="field">
+        <option value="q">Anything</option>
+        <option value="title">Title</option>
+        <option value="author">Author</option>
+        <option value="subject">Subject</option>
+      </select>
+      <label for="query" class="visually-hidden">Search text</label>
+      <input id="query" type="text" placeholder="e.g. harry potter" autocomplete="off" required>
+      <button id="search-btn" type="submit">Search</button>
+    </form>
+
+    <div id="loading">
+      <div class="spinner"></div>
+      <span>Searching the library…</span>
+    </div>
+
+    <p id="error"></p>
+    <p id="summary"></p>
+
+    <section id="results" aria-live="polite"></section>
+
+    <button id="more-btn" type="button">Load more</button>
+
+    <p class="note">
+      Data and covers from Open Library (openlibrary.org), a free API that needs no key.
+    </p>
+  </main>
+
+  <script>
+    // ── Step 3: JS DOM — grab the elements we need ──
+    const API = 'https://openlibrary.org/search.json';
+    const COVERS = 'https://covers.openlibrary.org/b/id/';
+    const FIELDS = 'key,title,author_name,first_publish_year,cover_i,edition_count';
+    const LIMIT = 12;
+
+    const form = document.querySelector('#search-form');
+    const fieldSelect = document.querySelector('#field');
+    const queryInput = document.querySelector('#query');
+    const searchBtn = document.querySelector('#search-btn');
+    const loading = document.querySelector('#loading');
+    const errorEl = document.querySelector('#error');
+    const summaryEl = document.querySelector('#summary');
+    const resultsEl = document.querySelector('#results');
+    const moreBtn = document.querySelector('#more-btn');
+
+    let currentQuery = '';
+    let currentField = 'q';
+    let page = 1;
+    let shown = 0;
+    let total = 0;
+
+    // Placeholder text follows the "Search by" choice
+    const placeholders = {
+      q: 'e.g. harry potter',
+      title: 'e.g. the hobbit',
+      author: 'e.g. jane austen',
+      subject: 'e.g. astronomy'
+    };
+
+    fieldSelect.addEventListener('change', () => {
+      queryInput.placeholder = placeholders[fieldSelect.value];
+      queryInput.focus();
+    });
+
+    // Submit = new search (stop the page from reloading)
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const query = queryInput.value.trim();
+      if (!query) {
+        showError('Please type something to search for');
+        return;
+      }
+      currentQuery = query;
+      currentField = fieldSelect.value;
+      page = 1;
+      shown = 0;
+      resultsEl.innerHTML = '';
+      searchBooks();
+    });
+
+    // "Load more" fetches the next page and appends cards
+    moreBtn.addEventListener('click', () => {
+      page++;
+      searchBooks();
+    });
+
+    // ── Step 4: Fetch — call the API ──
+    async function searchBooks() {
+      setLoading(true);
+
+      try {
+        const params = new URLSearchParams({
+          [currentField]: currentQuery,
+          fields: FIELDS,
+          limit: LIMIT,
+          page: page
+        });
+        const res = await fetch(`${API}?${params}`);
+
+        // fetch only rejects on network failure, so check the HTTP status ourselves
+        if (!res.ok) {
+          if (res.status === 429) throw new Error('Too many requests. Wait a few seconds');
+          if (res.status >= 500) throw new Error('Open Library is having trouble right now');
+          throw new Error('HTTP ' + res.status);
+        }
+
+        const data = await res.json();
+        total = data.numFound;
+
+        if (total === 0) throw new Error(`No books match "${currentQuery}"`);
+
+        renderBooks(data.docs);
+
+      } catch (err) {
+        // TypeError from fetch = no internet / request blocked
+        const message = err instanceof TypeError ? 'Could not reach Open Library. Check your connection' : err.message;
+        showError(message);
+        if (page > 1) page--; // so "Load more" retries the same page
+
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    // ── Step 5: Render — build one card per book ──
+    function renderBooks(books) {
+      books.forEach(book => {
+        const card = document.createElement('article');
+        card.className = 'book-card';
+
+        // Cover image (or a placeholder when the book has none)
+        const cover = document.createElement('div');
+        cover.className = 'cover';
+        if (book.cover_i) {
+          const img = document.createElement('img');
+          img.src = `${COVERS}${book.cover_i}-M.jpg`;
+          img.alt = 'Cover of ' + book.title;
+          img.loading = 'lazy';
+          cover.appendChild(img);
+        } else {
+          const noCover = document.createElement('span');
+          noCover.className = 'no-cover';
+          noCover.textContent = 'No cover available';
+          cover.appendChild(noCover);
+        }
+
+        const info = document.createElement('div');
+        info.className = 'book-info';
+
+        const title = document.createElement('h2');
+        title.className = 'book-title';
+        title.textContent = book.title;
+
+        const author = document.createElement('p');
+        author.className = 'book-author';
+        author.textContent = book.author_name ? book.author_name.slice(0, 2).join(', ') : 'Unknown author';
+
+        const meta = document.createElement('p');
+        meta.className = 'book-meta';
+        const year = book.first_publish_year ? 'First published ' + book.first_publish_year : 'Year unknown';
+        const editions = book.edition_count ? ' · ' + book.edition_count + (book.edition_count === 1 ? ' edition' : ' editions') : '';
+        meta.textContent = year + editions;
+
+        const link = document.createElement('a');
+        link.className = 'book-link';
+        link.href = 'https://openlibrary.org' + book.key;
+        link.target = '_blank';
+        link.rel = 'noopener';
+        link.textContent = 'View on Open Library →';
+
+        info.append(title, author, meta, link);
+        card.append(cover, info);
+        resultsEl.appendChild(card);
+      });
+
+      shown += books.length;
+      summaryEl.textContent = `Showing ${shown} of ${total.toLocaleString('en-US')} results for "${currentQuery}"`;
+      moreBtn.style.display = shown < total ? 'block' : 'none';
+    }
+
+    // ── Step 6: Bonus — loading & error states ──
+    function setLoading(isLoading) {
+      loading.style.display = isLoading ? 'flex' : 'none';
+      searchBtn.disabled = isLoading;
+      moreBtn.disabled = isLoading;
+      if (isLoading) {
+        errorEl.style.display = 'none';
+        if (page === 1) {
+          summaryEl.textContent = '';
+          moreBtn.style.display = 'none';
+        }
+      }
+    }
+
+    function showError(message) {
+      errorEl.textContent = '😕 ' + message + '. Try another search.';
+      errorEl.style.display = 'block';
+      if (shown === 0) summaryEl.textContent = '';
+    }
+
+    // Start with an example search so the page isn't empty
+    queryInput.value = 'harry potter';
+    form.requestSubmit();
+  </script>
+</body>
+</html>

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Explorer — Steps</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: sans-serif;
+        background-color: #fdf6ec;
+        color: #222;
+        line-height: 1.6;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 60px 16px;
+    }
+
+    .card {
+        background-color: white;
+        border-radius: 12px;
+        padding: 32px;
+        width: 100%;
+        max-width: 760px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 { color: #92400e; font-size: 1.6rem; margin-bottom: 4px; line-height: 1.3; }
+    .subtitle { color: #6b7280; font-size: 0.9rem; margin-bottom: 20px; }
+
+    .open-btn {
+        display: inline-block;
+        background-color: #d97706;
+        color: white;
+        font-weight: bold;
+        text-decoration: none;
+        border-radius: 8px;
+        padding: 10px 18px;
+        margin-bottom: 8px;
+    }
+
+    .step {
+        border-top: 1px solid #f1dcc0;
+        padding-top: 20px;
+        margin-top: 24px;
+    }
+
+    .step h2 {
+        font-size: 1.15rem;
+        color: #92400e;
+        margin-bottom: 8px;
+    }
+
+    .step-num {
+        display: inline-block;
+        background-color: #d97706;
+        color: white;
+        border-radius: 6px;
+        padding: 0 8px;
+        margin-right: 6px;
+        font-size: 0.9rem;
+    }
+
+    p { margin-bottom: 10px; }
+
+    ul { margin: 0 0 10px 20px; }
+    li { margin-bottom: 4px; }
+
+    code {
+        font-family: Consolas, monospace;
+        background-color: #fef3c7;
+        color: #92400e;
+        border-radius: 4px;
+        padding: 1px 5px;
+        font-size: 0.88em;
+    }
+
+    pre {
+        background-color: #1f2937;
+        color: #f3f4f6;
+        border-radius: 8px;
+        padding: 14px 16px;
+        overflow-x: auto;
+        font-size: 0.82rem;
+        line-height: 1.5;
+        margin-bottom: 12px;
+    }
+
+    pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+
+    .tip {
+        background-color: #ecfdf5;
+        border-left: 5px solid #10b981;
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>API Explorer — Open Library: Steps</h1>
+    <p class="subtitle">Week 7 Assignment · How the book search page was built, step by step</p>
+
+    <a class="open-btn" href="assignment_api_explorer_open_library.html">Open the finished page →</a>
+
+    <!-- Step 1 -->
+    <section class="step">
+      <h2><span class="step-num">1</span>HTML Structure</h2>
+      <p>Lay out every part of the page first, with an <code>id</code> on each element the JavaScript will need later.</p>
+      <ul>
+        <li>A <code>&lt;main class="container"&gt;</code> wrapper with an <code>&lt;h1&gt;</code> title and a subtitle.</li>
+        <li>A <code>&lt;form id="search-form"&gt;</code> holding a <code>&lt;select id="field"&gt;</code> (Anything / Title / Author / Subject), a text <code>&lt;input id="query"&gt;</code> and a submit <code>&lt;button id="search-btn"&gt;</code>.</li>
+        <li>Hidden <code>&lt;label&gt;</code>s (class <code>visually-hidden</code>) so screen readers still know what each control is.</li>
+        <li>Empty placeholders that JS fills in: <code>#loading</code>, <code>#error</code>, <code>#summary</code>, the <code>#results</code> section and a <code>#more-btn</code>.</li>
+      </ul>
+      <pre><code>&lt;form class="search" id="search-form"&gt;
+  &lt;select id="field"&gt;
+    &lt;option value="q"&gt;Anything&lt;/option&gt;
+    &lt;option value="title"&gt;Title&lt;/option&gt;
+    &lt;option value="author"&gt;Author&lt;/option&gt;
+    &lt;option value="subject"&gt;Subject&lt;/option&gt;
+  &lt;/select&gt;
+  &lt;input id="query" type="text" placeholder="e.g. harry potter" required&gt;
+  &lt;button id="search-btn" type="submit"&gt;Search&lt;/button&gt;
+&lt;/form&gt;
+
+&lt;div id="loading"&gt;&lt;div class="spinner"&gt;&lt;/div&gt;&lt;span&gt;Searching the library…&lt;/span&gt;&lt;/div&gt;
+&lt;p id="error"&gt;&lt;/p&gt;
+&lt;p id="summary"&gt;&lt;/p&gt;
+&lt;section id="results" aria-live="polite"&gt;&lt;/section&gt;
+&lt;button id="more-btn" type="button"&gt;Load more&lt;/button&gt;</code></pre>
+      <p class="tip">The option values (<code>q</code>, <code>title</code>, <code>author</code>, <code>subject</code>) are the exact query parameter names Open Library accepts, so JS can use them directly in the URL.</p>
+    </section>
+
+    <!-- Step 2 -->
+    <section class="step">
+      <h2><span class="step-num">2</span>CSS Layout &amp; Cards</h2>
+      <ul>
+        <li>Center a white <code>.container</code> on a warm background using <code>display: flex</code> on <code>body</code>.</li>
+        <li>Make the form a flex row with <code>flex-wrap: wrap</code> so it stacks on small screens.</li>
+        <li>Lay out the results with CSS Grid. <code>auto-fill</code> + <code>minmax()</code> fits as many columns as the width allows, with no media queries needed.</li>
+        <li>Each <code>.book-card</code> is a vertical flex box: cover on top, info below. <code>aspect-ratio: 2 / 3</code> keeps every cover the same shape and <code>object-fit: cover</code> crops the image instead of stretching it.</li>
+        <li>A small hover lift (<code>transform: translateY(-3px)</code>) gives the cards feedback.</li>
+      </ul>
+      <pre><code>#results {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+}
+
+.book-card { display: flex; flex-direction: column; border-radius: 10px; overflow: hidden; }
+.cover     { aspect-ratio: 2 / 3; background-color: #fef3c7; }
+.cover img { width: 100%; height: 100%; object-fit: cover; }
+.book-meta { margin-top: auto; } /* pushes year/editions to the bottom of every card */</code></pre>
+    </section>
+
+    <!-- Step 3 -->
+    <section class="step">
+      <h2><span class="step-num">3</span>JS DOM: Wire the Form</h2>
+      <p>Select the elements once at the top of the script, then listen for the form's <code>submit</code> event.</p>
+      <ul>
+        <li>Use <code>document.querySelector('#id')</code> for each element and store it in a <code>const</code>.</li>
+        <li>Call <code>e.preventDefault()</code> so the browser does not reload the page when the form is submitted.</li>
+        <li><code>.trim()</code> the input and show an error if it is empty.</li>
+        <li>Save the query and field, reset <code>page</code> to 1, clear the old cards and call <code>searchBooks()</code>.</li>
+        <li>Bonus: a <code>change</code> listener on the select swaps the placeholder text (e.g. "e.g. jane austen" for Author).</li>
+      </ul>
+      <pre><code>form.addEventListener('submit', (e) =&gt; {
+  e.preventDefault();
+  const query = queryInput.value.trim();
+  if (!query) {
+    showError('Please type something to search for');
+    return;
+  }
+  currentQuery = query;
+  currentField = fieldSelect.value;
+  page = 1;
+  shown = 0;
+  resultsEl.innerHTML = '';
+  searchBooks();
+});</code></pre>
+      <p class="tip">Listening for <code>submit</code> on the form (rather than <code>click</code> on the button) means pressing Enter in the input also works.</p>
+    </section>
+
+    <!-- Step 4 -->
+    <section class="step">
+      <h2><span class="step-num">4</span>Fetch: Call the API</h2>
+      <p>The endpoint is <code>https://openlibrary.org/search.json</code>. It needs no API key and allows requests from any website.</p>
+      <ul>
+        <li>Build the query string with <code>URLSearchParams</code> so spaces and symbols are encoded for you. <code>[currentField]: currentQuery</code> uses the select's value as the parameter name.</li>
+        <li><code>fields=</code> asks only for the data the cards need, which makes the response much smaller and faster.</li>
+        <li><code>limit</code> and <code>page</code> control paging (12 books per page).</li>
+        <li><code>await fetch(...)</code> then <code>await res.json()</code>. The useful parts of the response are <code>numFound</code> (total matches) and <code>docs</code> (the array of books).</li>
+        <li><code>fetch</code> does <em>not</em> throw on 404/500, so check <code>res.ok</code> and throw your own error.</li>
+      </ul>
+      <pre><code>const params = new URLSearchParams({
+  [currentField]: currentQuery,          // e.g. author=jane austen
+  fields: 'key,title,author_name,first_publish_year,cover_i,edition_count',
+  limit: 12,
+  page: page
+});
+const res = await fetch(`https://openlibrary.org/search.json?${params}`);
+if (!res.ok) throw new Error('HTTP ' + res.status);
+
+const data = await res.json();
+total = data.numFound;
+if (total === 0) throw new Error(`No books match "${currentQuery}"`);
+renderBooks(data.docs);</code></pre>
+      <p>Example of one item in <code>data.docs</code>:</p>
+      <pre><code>{
+  "key": "/works/OL82563W",
+  "title": "Harry Potter and the Philosopher's Stone",
+  "author_name": ["J. K. Rowling"],
+  "first_publish_year": 1997,
+  "cover_i": 15155833,
+  "edition_count": 400
+}</code></pre>
+    </section>
+
+    <!-- Step 5 -->
+    <section class="step">
+      <h2><span class="step-num">5</span>Render: Display the Cards</h2>
+      <p>Loop over <code>data.docs</code> with <code>forEach</code> and build one card per book using <code>createElement</code>.</p>
+      <ul>
+        <li><strong>Cover:</strong> if <code>cover_i</code> exists, the image URL is <code>https://covers.openlibrary.org/b/id/{cover_i}-M.jpg</code> (<code>S</code>, <code>M</code> or <code>L</code> for size). Otherwise show a "No cover available" box. Add <code>loading="lazy"</code> so off-screen covers load only when scrolled to.</li>
+        <li><strong>Title &amp; author:</strong> set with <code>textContent</code> (not <code>innerHTML</code>) so book data can never inject HTML. <code>author_name</code> can be missing, so fall back to "Unknown author".</li>
+        <li><strong>Meta line:</strong> first publish year and edition count.</li>
+        <li><strong>Link:</strong> <code>'https://openlibrary.org' + book.key</code> opens the book's page in a new tab.</li>
+        <li>Append the card to <code>#results</code>, then update the summary ("Showing 12 of 4,069 results…") and show <strong>Load more</strong> only if <code>shown &lt; total</code>.</li>
+      </ul>
+      <pre><code>function renderBooks(books) {
+  books.forEach(book =&gt; {
+    const card = document.createElement('article');
+    card.className = 'book-card';
+
+    const cover = document.createElement('div');
+    cover.className = 'cover';
+    if (book.cover_i) {
+      const img = document.createElement('img');
+      img.src = `https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`;
+      img.alt = 'Cover of ' + book.title;
+      img.loading = 'lazy';
+      cover.appendChild(img);
+    }
+
+    const title = document.createElement('h2');
+    title.textContent = book.title;
+    // ...author, meta and link built the same way...
+
+    card.append(cover, info);
+    resultsEl.appendChild(card);
+  });
+
+  shown += books.length;
+  moreBtn.style.display = shown &lt; total ? 'block' : 'none';
+}</code></pre>
+    </section>
+
+    <!-- Step 6 -->
+    <section class="step">
+      <h2><span class="step-num">6</span>Bonus: Loading &amp; Errors</h2>
+      <p>Wrap the fetch in <code>try / catch / finally</code> so the user always knows what is happening.</p>
+      <ul>
+        <li><strong>Loading:</strong> <code>setLoading(true)</code> before the fetch shows the CSS spinner, hides old errors and disables the buttons so the user can't double-submit.</li>
+        <li><strong>Errors:</strong> the <code>catch</code> block shows a red message box. A <code>TypeError</code> from <code>fetch</code> means the network failed; other errors are the ones we threw (bad status, no results).</li>
+        <li><strong>finally:</strong> runs on success <em>and</em> failure, so the spinner always disappears and the buttons are re-enabled.</li>
+        <li>If "Load more" fails, <code>page</code> is moved back by one so clicking it again retries the same page.</li>
+      </ul>
+      <pre><code>async function searchBooks() {
+  setLoading(true);
+  try {
+    // ...fetch + render (Steps 4 &amp; 5)...
+  } catch (err) {
+    const message = err instanceof TypeError
+      ? 'Could not reach Open Library. Check your connection'
+      : err.message;
+    showError(message);
+    if (page &gt; 1) page--;
+  } finally {
+    setLoading(false);
+  }
+}</code></pre>
+      <pre><code>.spinner {
+    width: 22px; height: 22px;
+    border: 3px solid #fde68a;
+    border-top-color: #d97706;   /* one coloured side = the moving part */
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }</code></pre>
+      <p class="tip">To test: search for nonsense like <code>zzqqxx</code> to see the "no results" error, or turn on Offline mode in DevTools (Network tab) to see the connection error and the spinner.</p>
+    </section>
+  </div>
+</body>
+</html>
